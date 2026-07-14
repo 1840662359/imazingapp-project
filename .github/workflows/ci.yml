@@ -1,0 +1,70 @@
+name: CI
+
+# 触发：推送到 main、或针对 main 的 PR。
+# 与微信云托管流水线的分工：
+#   - GitHub Actions（本文件）= CI 门禁：fmt / clippy / test + 校验 Docker 镜像可构建
+#   - 微信云托管流水线        = CD    ：push 触发后用 Dockerfile 构建镜像并部署到 80 端口
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# 同一分支只保留最新一次运行，节省 Actions 额度
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # 仓库里的 rust-toolchain.toml 固定为 Windows GNU 工具链（本地开发用）。
+  # CI 跑在 Linux 上，用该变量强制覆盖为 Linux stable，
+  # 避免 rustup 去下载 Windows 主机工具链而失败。
+  # （RUSTUP_TOOLCHAIN 优先级高于 rust-toolchain.toml。）
+  RUSTUP_TOOLCHAIN: stable
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # ── 代码质量 + 测试（对应 CLAUDE.md 提交前要求：fmt / check / test）──
+  test:
+    name: 格式 / Clippy / 测试
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 Rust (stable + rustfmt + clippy)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: 缓存 cargo 构建产物
+        uses: Swatinem/rust-cache@v2
+
+      - name: 格式检查
+        run: cargo fmt --all -- --check
+
+      - name: Clippy（警告视为错误）
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: 运行测试
+        run: cargo test --workspace
+
+  # ── 校验 Docker 镜像可构建（与微信云托管实际构建的产物一致）──
+  docker:
+    name: Docker 构建校验
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 设置 Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 构建镜像（仅校验，不推送）
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: imazing-server:ci
+          # 复用 Actions 缓存加速 Docker 层构建
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

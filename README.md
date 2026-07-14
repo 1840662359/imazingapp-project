@@ -106,6 +106,20 @@
 3.  真机导入验证
 4.  微信审核上线
 
+## 持续集成 / 部署
+
+分工：
+
+-   **GitHub Actions**（`.github/workflows/ci.yml`）= CI 门禁
+    -   push / PR 到 `main` 时触发
+    -   `cargo fmt --check`、`cargo clippy -D warnings`、`cargo test`
+    -   用真实 `Dockerfile` 校验镜像可构建（与云托管产物一致）
+-   **微信云托管流水线** = CD
+    -   push 到指定分支触发，用 `Dockerfile` 构建镜像并部署到 80 端口
+
+注意：仓库 `rust-toolchain.toml` 固定为 Windows GNU 工具链（本地开发用）。
+CI 在 Linux 上用环境变量 `RUSTUP_TOOLCHAIN=stable` 覆盖，避免下载 Windows 工具链失败。
+
 ## 开发要求
 
 -   Rust 2024 Edition
