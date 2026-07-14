@@ -7,7 +7,7 @@
 
 ## 当前状态
 
-项目已完成核心生成链路，进入部署上线阶段。
+核心生成链路完成，已部署到微信云托管。
 
 完成流程：
 
@@ -15,7 +15,7 @@
         ↓
     schema 驱动动态配置页面
         ↓
-    HTTP API
+    wx.cloud.callContainer（内网直达容器）
         ↓
     Rust Pipeline
         ↓
@@ -25,7 +25,9 @@
         ↓
     Template Engine
         ↓
-    .imazingapp 文件
+    .imazingapp 文件字节（直接返回，无服务端存储）
+        ↓
+    小程序本地缓存最新文件 → 分享到微信
 
 ## 已实现功能
 
@@ -56,15 +58,16 @@
     ├── versions.json
     └── translations/
 
-支持配置：
+支持配置（当前 10 项字段）：
 
--   FPS
 -   画质
+-   FPS
 -   分辨率缩放
--   亮度
--   阴影
--   抗锯齿
 -   视觉风格
+-   抗锯齿
+-   阴影
+-   渲染优化（开启写入 5 条 CVar，关闭移除）
+-   亮度
 -   镜头视野
 -   冲刺灵敏度
 
@@ -76,11 +79,14 @@
 
 当前接口：
 
-    GET  /api/v1/schema
+    GET  /api/v1/health    健康检查
+    GET  /api/v1/schema    返回配置 schema（驱动前端 UI）
+    GET  /api/v1/presets   返回预设列表（当前为空）
+    POST /api/v1/build      生成并直接返回 .imazingapp 文件字节
 
-    POST /api/v1/build
-
-    GET  /api/v1/download/{id}
+说明：`/build` 直接以 `application/octet-stream` 返回文件字节，
+文件名经 `Content-Disposition` 传递。已移除服务端存储与
+`/download/{id}` 接口，服务端因此无状态、可多实例横向扩容。
 
 ## 小程序
 
@@ -93,7 +99,9 @@
 -   schema 自动生成配置 UI
 -   支持 select/switch/slider
 -   支持动态默认值
--   支持生成文件分享
+-   通过 `wx.cloud.callContainer` 调用云托管（无需配置合法域名）
+-   本地只缓存最新一个文件，支持反复分享（无需重新生成）
+-   生成按钮 5 秒冷却兜底防刷
 
 ## 当前待完成
 
@@ -101,10 +109,8 @@
 
 主要剩余：
 
-1.  微信云托管正式部署
-2.  真实存储服务替换 Mock Storage
-3.  真机导入验证
-4.  微信审核上线
+1.  真机导入验证（iMazing 导入 + 游戏内生效）
+2.  微信审核上线
 
 ## 持续集成 / 部署
 
