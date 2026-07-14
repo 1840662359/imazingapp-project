@@ -89,7 +89,7 @@ impl IniDoc {
             }
 
             // Entry: +CVars=key=value
-            if line.starts_with("+CVars=") {
+            if let Some(entry) = line.strip_prefix("+CVars=") {
                 let Some(ref section_name) = current_section else {
                     return Err(Error::Validation(
                         "Entry found before any section".to_string(),
@@ -97,17 +97,13 @@ impl IniDoc {
                 };
 
                 // 解析 key=value
-                let entry = &line[7..]; // 去掉 "+CVars="
                 if let Some((key, value)) = entry.split_once('=') {
                     sections
                         .get_mut(section_name)
                         .unwrap()
                         .insert(key.to_string(), value.to_string());
                 } else {
-                    return Err(Error::Validation(format!(
-                        "Invalid entry format: {}",
-                        line
-                    )));
+                    return Err(Error::Validation(format!("Invalid entry format: {}", line)));
                 }
             }
         }
@@ -285,8 +281,12 @@ mod tests {
     fn test_set() {
         let mut doc = IniDoc::load(b"").unwrap();
 
-        doc.set("UserCustom DeviceProfile", "r.MobileContentScaleFactor", "2.0")
-            .unwrap();
+        doc.set(
+            "UserCustom DeviceProfile",
+            "r.MobileContentScaleFactor",
+            "2.0",
+        )
+        .unwrap();
 
         assert_eq!(
             doc.get("UserCustom DeviceProfile", "r.MobileContentScaleFactor"),
@@ -299,8 +299,12 @@ mod tests {
         let ini = b"[UserCustom DeviceProfile]\n+CVars=r.MobileContentScaleFactor=1.0\n";
         let mut doc = IniDoc::load(ini).unwrap();
 
-        doc.set("UserCustom DeviceProfile", "r.MobileContentScaleFactor", "2.0")
-            .unwrap();
+        doc.set(
+            "UserCustom DeviceProfile",
+            "r.MobileContentScaleFactor",
+            "2.0",
+        )
+        .unwrap();
 
         assert_eq!(
             doc.get("UserCustom DeviceProfile", "r.MobileContentScaleFactor"),
@@ -316,8 +320,7 @@ mod tests {
 
         let mut doc = IniDoc::load(ini).unwrap();
 
-        doc.remove("UserCustom DeviceProfile", "t.MaxFPS")
-            .unwrap();
+        doc.remove("UserCustom DeviceProfile", "t.MaxFPS").unwrap();
 
         assert_eq!(doc.get("UserCustom DeviceProfile", "t.MaxFPS"), None);
         assert_eq!(
@@ -330,8 +333,12 @@ mod tests {
     fn test_save() {
         let mut doc = IniDoc::load(b"").unwrap();
 
-        doc.set("UserCustom DeviceProfile", "r.MobileContentScaleFactor", "2.0")
-            .unwrap();
+        doc.set(
+            "UserCustom DeviceProfile",
+            "r.MobileContentScaleFactor",
+            "2.0",
+        )
+        .unwrap();
         doc.set("UserCustom DeviceProfile", "sg.ResolutionQuality", "100")
             .unwrap();
 

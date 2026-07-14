@@ -32,7 +32,7 @@ fn test_load_real_save() {
     let save = SaveFile::load(&sav_bytes).expect("解析 sav 失败");
 
     // 验证属性数量
-    assert!(save.len() > 0, "sav 应该有属性");
+    assert!(!save.is_empty(), "sav 应该有属性");
     println!("✓ 加载成功，共 {} 个属性", save.len());
 }
 
@@ -55,7 +55,9 @@ fn test_get_properties() {
     for prop_name in test_props {
         assert!(save.exists(prop_name), "属性 {} 应该存在", prop_name);
 
-        let value = save.get(prop_name).expect(&format!("读取 {} 失败", prop_name));
+        let value = save
+            .get(prop_name)
+            .unwrap_or_else(|_| panic!("读取 {} 失败", prop_name));
 
         match value {
             TypedValue::Int(v) => println!("  {} = {} (Int)", prop_name, v),
@@ -96,11 +98,13 @@ fn test_set_and_save() {
 
     // 序列化
     let new_bytes = save.save().expect("序列化失败");
-    assert!(new_bytes.len() > 0, "序列化后应有数据");
+    assert!(!new_bytes.is_empty(), "序列化后应有数据");
 
     // 重新加载验证
     let reloaded = SaveFile::load(&new_bytes).expect("重新加载失败");
-    let reloaded_fps = reloaded.get("FPSLevel").expect("读取重新加载的 FPSLevel 失败");
+    let reloaded_fps = reloaded
+        .get("FPSLevel")
+        .expect("读取重新加载的 FPSLevel 失败");
     assert_eq!(reloaded_fps, TypedValue::Int(7), "重新加载后值应保持");
 
     println!("✓ 修改并序列化成功");
@@ -132,7 +136,10 @@ fn test_remove_property() {
     let new_bytes = save.save().expect("序列化失败");
     let reloaded = SaveFile::load(&new_bytes).expect("重新加载失败");
 
-    assert!(!reloaded.exists("FPSLevel"), "重新加载后 FPSLevel 应该不存在");
+    assert!(
+        !reloaded.exists("FPSLevel"),
+        "重新加载后 FPSLevel 应该不存在"
+    );
     assert_eq!(reloaded.len(), original_len - 1, "重新加载后属性数量应正确");
 
     println!("✓ 删除属性成功");
@@ -192,7 +199,7 @@ fn test_property_names() {
     let save = SaveFile::load(&sav_bytes).expect("解析失败");
 
     let names = save.property_names();
-    assert!(names.len() > 0, "应该有属性名");
+    assert!(!names.is_empty(), "应该有属性名");
     assert!(names.contains(&"FPSLevel".to_string()), "应该包含 FPSLevel");
 
     println!("✓ 属性名列表正确，共 {} 个", names.len());

@@ -36,10 +36,7 @@ pub enum PatchAction {
 
     /// 追加：对 ini 是"在 section 末尾添加新行"，对 sav 是"新增属性"。
     /// （当前配置未用到，预留给将来扩展）
-    Append {
-        address: String,
-        value: TypedValue,
-    },
+    Append { address: String, value: TypedValue },
 
     /// 替换：查找匹配的旧值并替换为新值。
     /// （当前配置未用到，预留给复杂场景如正则替换）
@@ -60,7 +57,11 @@ pub enum PatchAction {
 
 impl PatchOp {
     /// 创建一个 Set 操作。
-    pub fn set(target_id: impl Into<String>, address: impl Into<String>, value: TypedValue) -> Self {
+    pub fn set(
+        target_id: impl Into<String>,
+        address: impl Into<String>,
+        value: TypedValue,
+    ) -> Self {
         Self {
             target_id: target_id.into(),
             action: PatchAction::Set {
@@ -81,7 +82,11 @@ impl PatchOp {
     }
 
     /// 创建一个 Append 操作。
-    pub fn append(target_id: impl Into<String>, address: impl Into<String>, value: TypedValue) -> Self {
+    pub fn append(
+        target_id: impl Into<String>,
+        address: impl Into<String>,
+        value: TypedValue,
+    ) -> Self {
         Self {
             target_id: target_id.into(),
             action: PatchAction::Append {

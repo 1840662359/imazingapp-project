@@ -17,10 +17,14 @@ fn get_template_path() -> PathBuf {
 #[test]
 fn test_load_real_template() {
     let template_path = get_template_path();
-    assert!(template_path.exists(), "模板文件不存在: {:?}", template_path);
+    assert!(
+        template_path.exists(),
+        "模板文件不存在: {:?}",
+        template_path
+    );
 
     let template_bytes = std::fs::read(&template_path).expect("读取模板失败");
-    assert!(template_bytes.len() > 0, "模板文件为空");
+    assert!(!template_bytes.is_empty(), "模板文件为空");
 
     println!("✓ 模板文件大小: {} bytes", template_bytes.len());
 }
@@ -45,11 +49,15 @@ fn test_transform_no_change() {
 
     // 验证关键文件存在
     assert!(
-        output_zip.by_name("Container/Documents/ShadowTrackerExtra/Saved/SaveGames/Active.sav").is_ok(),
+        output_zip
+            .by_name("Container/Documents/ShadowTrackerExtra/Saved/SaveGames/Active.sav")
+            .is_ok(),
         "Active.sav 应该存在"
     );
     assert!(
-        output_zip.by_name("Container/Documents/ShadowTrackerExtra/Saved/Config/IOS/UserCustom.ini").is_ok(),
+        output_zip
+            .by_name("Container/Documents/ShadowTrackerExtra/Saved/Config/IOS/UserCustom.ini")
+            .is_ok(),
         "UserCustom.ini 应该存在"
     );
 
@@ -101,10 +109,7 @@ fn test_transform_active_sav() {
         bytes
     };
 
-    assert!(
-        !ini_bytes.starts_with(b"TRANSFORMED:"),
-        "ini 不应该被转换"
-    );
+    assert!(!ini_bytes.starts_with(b"TRANSFORMED:"), "ini 不应该被转换");
 
     println!("✓ Active.sav 转换成功，其它文件未改动");
 }
@@ -141,7 +146,10 @@ fn test_transform_user_custom_ini() {
 
     // 应该全是大写
     assert!(
-        transformed_content.chars().filter(|c| c.is_alphabetic()).all(|c| c.is_uppercase()),
+        transformed_content
+            .chars()
+            .filter(|c| c.is_alphabetic())
+            .all(|c| c.is_uppercase()),
         "ini 应该全部大写"
     );
 
@@ -222,10 +230,7 @@ fn test_streaming_no_temp_files() {
 
     let after_count = std::fs::read_dir(&cwd).unwrap().count();
 
-    assert_eq!(
-        before_count, after_count,
-        "不应该产生临时文件"
-    );
+    assert_eq!(before_count, after_count, "不应该产生临时文件");
 
     println!("✓ 流式处理无临时文件");
 }
@@ -256,7 +261,7 @@ fn test_output_is_valid_zip() {
     let output_cursor = std::io::Cursor::new(&output_bytes);
     let output_zip = zip::ZipArchive::new(output_cursor).unwrap();
 
-    assert!(output_zip.len() > 0, "输出 zip 应该有内容");
+    assert!(!output_zip.is_empty(), "输出 zip 应该有内容");
 
     // 可以写到临时文件并用外部工具验证（可选）
     // std::fs::write("/tmp/output.imazingapp", &output_bytes).unwrap();

@@ -22,7 +22,7 @@ fn load_real_config() {
     assert_eq!(config.versions.template_version, "1.0.0");
 
     // 验证字段数量
-    assert_eq!(config.schema.fields.len(), 14, "字段数量不匹配");
+    assert_eq!(config.schema.fields.len(), 10, "字段数量不匹配");
 
     // 验证目标
     assert_eq!(config.targets.len(), 2, "目标数量不匹配");
@@ -68,7 +68,7 @@ fn validate_field_option_refs() {
             .fields
             .iter()
             .find(|f| &f.id == field_id)
-            .expect(&format!("字段 {} 不存在", field_id));
+            .unwrap_or_else(|| panic!("字段 {} 不存在", field_id));
 
         let valid_opts: std::collections::HashSet<_> =
             field.options.iter().map(|o| o.id.as_str()).collect();

@@ -40,7 +40,7 @@ impl PatchTranslator for DefaultPatchTranslator {
                     return Err(Error::Validation(format!(
                         "field '{}' has no bindings in config",
                         field_id
-                    )))
+                    )));
                 }
             };
 
@@ -116,20 +116,16 @@ fn generate_set_op(
                 return Err(Error::Validation(format!(
                     "field '{}' expects an option id, got raw value",
                     field_id
-                )))
+                )));
             }
         };
 
-        binding
-            .value_map
-            .get(opt_id)
-            .cloned()
-            .ok_or_else(|| {
-                Error::Validation(format!(
-                    "field '{}' selected option '{}' has no value mapping",
-                    field_id, opt_id
-                ))
-            })?
+        binding.value_map.get(opt_id).cloned().ok_or_else(|| {
+            Error::Validation(format!(
+                "field '{}' selected option '{}' has no value mapping",
+                field_id, opt_id
+            ))
+        })?
     };
 
     Ok(PatchOp::set(&binding.target_id, address, value))
@@ -139,27 +135,27 @@ fn generate_set_op(
 fn parse_value_from_json(json: &serde_json::Value, value_type: ValueType) -> Result<TypedValue> {
     match value_type {
         ValueType::Int => {
-            let v = json.as_i64().ok_or_else(|| {
-                Error::Validation(format!("expected int, got {:?}", json))
-            })?;
+            let v = json
+                .as_i64()
+                .ok_or_else(|| Error::Validation(format!("expected int, got {:?}", json)))?;
             Ok(TypedValue::Int(v))
         }
         ValueType::Float => {
-            let v = json.as_f64().ok_or_else(|| {
-                Error::Validation(format!("expected float, got {:?}", json))
-            })?;
+            let v = json
+                .as_f64()
+                .ok_or_else(|| Error::Validation(format!("expected float, got {:?}", json)))?;
             Ok(TypedValue::Float(v))
         }
         ValueType::Bool => {
-            let v = json.as_bool().ok_or_else(|| {
-                Error::Validation(format!("expected bool, got {:?}", json))
-            })?;
+            let v = json
+                .as_bool()
+                .ok_or_else(|| Error::Validation(format!("expected bool, got {:?}", json)))?;
             Ok(TypedValue::Bool(v))
         }
         ValueType::Str => {
-            let v = json.as_str().ok_or_else(|| {
-                Error::Validation(format!("expected string, got {:?}", json))
-            })?;
+            let v = json
+                .as_str()
+                .ok_or_else(|| Error::Validation(format!("expected string, got {:?}", json)))?;
             Ok(TypedValue::Str(v.to_string()))
         }
         ValueType::Enum => Err(Error::Validation(
@@ -172,21 +168,21 @@ fn parse_value_from_json(json: &serde_json::Value, value_type: ValueType) -> Res
 fn parse_value_from_string(input: &str, value_type: ValueType) -> Result<TypedValue> {
     match value_type {
         ValueType::Int => {
-            let v = input.parse::<i64>().map_err(|_| {
-                Error::Validation(format!("cannot parse '{}' as int", input))
-            })?;
+            let v = input
+                .parse::<i64>()
+                .map_err(|_| Error::Validation(format!("cannot parse '{}' as int", input)))?;
             Ok(TypedValue::Int(v))
         }
         ValueType::Float => {
-            let v = input.parse::<f64>().map_err(|_| {
-                Error::Validation(format!("cannot parse '{}' as float", input))
-            })?;
+            let v = input
+                .parse::<f64>()
+                .map_err(|_| Error::Validation(format!("cannot parse '{}' as float", input)))?;
             Ok(TypedValue::Float(v))
         }
         ValueType::Bool => {
-            let v = input.parse::<bool>().map_err(|_| {
-                Error::Validation(format!("cannot parse '{}' as bool", input))
-            })?;
+            let v = input
+                .parse::<bool>()
+                .map_err(|_| Error::Validation(format!("cannot parse '{}' as bool", input)))?;
             Ok(TypedValue::Bool(v))
         }
         ValueType::Str => Ok(TypedValue::Str(input.to_string())),
@@ -230,8 +226,8 @@ mod tests {
             TypedValue::Int(42)
         );
         assert_eq!(
-            parse_value_from_string("3.14", ValueType::Float).unwrap(),
-            TypedValue::Float(3.14)
+            parse_value_from_string("2.5", ValueType::Float).unwrap(),
+            TypedValue::Float(2.5)
         );
         assert_eq!(
             parse_value_from_string("true", ValueType::Bool).unwrap(),
@@ -256,8 +252,8 @@ mod tests {
             TypedValue::Int(42)
         );
         assert_eq!(
-            parse_value_from_json(&json!(3.14), ValueType::Float).unwrap(),
-            TypedValue::Float(3.14)
+            parse_value_from_json(&json!(2.5), ValueType::Float).unwrap(),
+            TypedValue::Float(2.5)
         );
         assert_eq!(
             parse_value_from_json(&json!(true), ValueType::Bool).unwrap(),
@@ -269,4 +265,3 @@ mod tests {
         );
     }
 }
-

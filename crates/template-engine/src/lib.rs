@@ -74,11 +74,13 @@ impl TemplateEngine {
 
             // 目录条目直接复制
             if is_dir {
-                let options = zip::write::FileOptions::<()>::default()
-                    .compression_method(compression);
+                let options =
+                    zip::write::FileOptions::<()>::default().compression_method(compression);
                 output_zip
                     .add_directory(&entry_path, options)
-                    .map_err(|e| Error::Template(format!("add directory {} failed: {}", entry_path, e)))?;
+                    .map_err(|e| {
+                        Error::Template(format!("add directory {} failed: {}", entry_path, e))
+                    })?;
                 continue;
             }
 

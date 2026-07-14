@@ -44,6 +44,9 @@ use save_engine::SaveFile;
 use std::collections::HashMap;
 use template_engine::TemplateEngine;
 
+/// 单个 target 的字节转换器：输入原始文件字节，输出修改后的字节。
+type Transformer = Box<dyn Fn(&[u8]) -> Result<Vec<u8>>>;
+
 /// 生成配置文件
 ///
 /// ## 参数
@@ -92,16 +95,12 @@ pub fn generate(
     tracing::debug!("步骤 2: 按目标分组");
     let mut grouped: HashMap<String, Vec<&PatchOp>> = HashMap::new();
     for op in &ops {
-        grouped
-            .entry(op.target_id.clone())
-            .or_insert_with(Vec::new)
-            .push(op);
+        grouped.entry(op.target_id.clone()).or_default().push(op);
     }
 
     // 3. 构造 transformers
     tracing::debug!("步骤 3: 构造 transformers");
-    let mut transformers: HashMap<String, Box<dyn Fn(&[u8]) -> Result<Vec<u8>>>> =
-        HashMap::new();
+    let mut transformers: HashMap<String, Transformer> = HashMap::new();
 
     // 为每个 target 创建 transformer
     for (target_id, target_ops) in grouped {
@@ -158,7 +157,10 @@ pub fn generate(
                     .unwrap_or_else(|| "[UserCustom DeviceProfile]".to_string());
 
                 // 去掉 section 的方括号
-                let section = section.trim_start_matches('[').trim_end_matches(']').to_string();
+                let section = section
+                    .trim_start_matches('[')
+                    .trim_end_matches(']')
+                    .to_string();
 
                 let ops_owned: Vec<PatchOp> = target_ops.iter().map(|op| (*op).clone()).collect();
 
@@ -237,11 +239,20 @@ mod tests {
     fn test_typed_value_to_string() {
         use domain::value::TypedValue;
 
-        assert_eq!(typed_value_to_string(&TypedValue::Str("test".to_string())).unwrap(), "test");
+        assert_eq!(
+            typed_value_to_string(&TypedValue::Str("test".to_string())).unwrap(),
+            "test"
+        );
         assert_eq!(typed_value_to_string(&TypedValue::Int(42)).unwrap(), "42");
-        assert_eq!(typed_value_to_string(&TypedValue::Float(3.14)).unwrap(), "3.14");
+        assert_eq!(
+            typed_value_to_string(&TypedValue::Float(2.5)).unwrap(),
+            "2.5"
+        );
         assert_eq!(typed_value_to_string(&TypedValue::Bool(true)).unwrap(), "1");
-        assert_eq!(typed_value_to_string(&TypedValue::Bool(false)).unwrap(), "0");
+        assert_eq!(
+            typed_value_to_string(&TypedValue::Bool(false)).unwrap(),
+            "0"
+        );
         assert_eq!(typed_value_to_string(&TypedValue::Enum(5)).unwrap(), "5");
     }
 }

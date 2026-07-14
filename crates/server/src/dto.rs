@@ -82,20 +82,11 @@ pub struct BuildRequest {
     pub selections: Option<std::collections::HashMap<String, serde_json::Value>>,
 }
 
-/// POST /api/v1/build 响应
-#[derive(Debug, Serialize)]
-pub struct BuildResponse {
-    /// 文件 ID（用于下载）
-    pub file_id: String,
-    /// 过期时间（秒）
-    pub expires_in: u64,
-}
-
 // ============================================================================
-// GET /api/v1/download/{file_id}
+// 错误响应
 // ============================================================================
 
-/// 下载错误响应
+/// 错误响应
 #[derive(Debug, Serialize)]
 pub struct ErrorResponse {
     pub error: String,
@@ -112,10 +103,6 @@ impl ErrorResponse {
             error: error.into(),
             message: message.into(),
         }
-    }
-
-    pub fn not_found(message: impl Into<String>) -> Self {
-        Self::new("not_found", message)
     }
 
     pub fn validation_error(message: impl Into<String>) -> Self {

@@ -5,7 +5,7 @@
 use std::sync::Arc;
 
 use axum::extract::State;
-use axum::http::{header, StatusCode};
+use axum::http::{StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
@@ -75,17 +75,29 @@ fn generate_filename(selections: &Selections) -> String {
 
     // 4.1 抗锯齿开关（anti_aliasing: on/off）
     if let Some(Selection::Option(aa)) = selections.get("anti_aliasing") {
-        filename.push_str(if aa == "on" { "抗锯齿开" } else { "抗锯齿关" });
+        filename.push_str(if aa == "on" {
+            "抗锯齿开"
+        } else {
+            "抗锯齿关"
+        });
     }
 
     // 4.2 阴影开关（shadow: on/off）
     if let Some(Selection::Option(shadow)) = selections.get("shadow") {
-        filename.push_str(if shadow == "on" { "阴影开" } else { "阴影关" });
+        filename.push_str(if shadow == "on" {
+            "阴影开"
+        } else {
+            "阴影关"
+        });
     }
 
     // 4.3 渲染优化开关（render_optimization: on/off）
     if let Some(Selection::Option(render_opt)) = selections.get("render_optimization") {
-        filename.push_str(if render_opt == "on" { "渲染优化开" } else { "渲染优化关" });
+        filename.push_str(if render_opt == "on" {
+            "渲染优化开"
+        } else {
+            "渲染优化关"
+        });
     }
 
     // 5. 屏幕亮度（brightness: 0.8-5.0，显示为 80%-500%）
@@ -156,9 +168,7 @@ async fn get_schema(State(state): State<AppState>) -> Result<Json<SchemaResponse
 /// GET /api/v1/presets
 ///
 /// 返回所有预设的详细信息
-async fn get_presets(
-    State(state): State<AppState>,
-) -> Result<Json<PresetsResponse>, AppError> {
+async fn get_presets(State(state): State<AppState>) -> Result<Json<PresetsResponse>, AppError> {
     let presets = state.config_service.get_presets().await?;
     Ok(Json(PresetsResponse { presets }))
 }
@@ -179,9 +189,7 @@ async fn build(
         // 解析自定义选择
         parse_selections(raw_selections)?
     } else {
-        return Err(AppError::validation(
-            "必须提供 preset_id 或 selections",
-        ));
+        return Err(AppError::validation("必须提供 preset_id 或 selections"));
     };
 
     // 2. 调用构建服务
@@ -233,7 +241,7 @@ fn parse_selections(
                 return Err(AppError::validation(format!(
                     "字段 {} 的值类型不支持",
                     field_id
-                )))
+                )));
             }
         };
 
@@ -258,13 +266,6 @@ impl AppError {
         Self {
             status: StatusCode::BAD_REQUEST,
             response: ErrorResponse::validation_error(message),
-        }
-    }
-
-    pub fn not_found(message: impl Into<String>) -> Self {
-        Self {
-            status: StatusCode::NOT_FOUND,
-            response: ErrorResponse::not_found(message),
         }
     }
 

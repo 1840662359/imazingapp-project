@@ -231,4 +231,3 @@ impl BuildService for MockBuildService {
         Ok(vec![0u8; 1024 * 1024])
     }
 }
-

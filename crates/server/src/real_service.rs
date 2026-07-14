@@ -48,7 +48,8 @@ impl ConfigService for RealConfigService {
 
             // 计算 display_min 和 display_max
             let (display_min, display_max) = if let (Some(min), Some(max), Some(multiplier)) =
-                (field.min, field.max, field.display_multiplier) {
+                (field.min, field.max, field.display_multiplier)
+            {
                 (Some(min * multiplier), Some(max * multiplier))
             } else {
                 (None, None)

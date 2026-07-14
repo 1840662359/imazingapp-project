@@ -194,7 +194,7 @@ mod tests {
         // 测试类型转换的往返
         let test_cases = vec![
             TypedValue::Int(42),
-            TypedValue::Float(3.14),
+            TypedValue::Float(2.5),
             TypedValue::Bool(true),
             TypedValue::Str("hello".to_string()),
         ];
@@ -206,17 +206,10 @@ mod tests {
             // Float 会有精度损失（f64 → f32 → f64），容差比较
             match (&original, &converted) {
                 (TypedValue::Float(a), TypedValue::Float(b)) => {
-                    assert!(
-                        (a - b).abs() < 0.001,
-                        "float mismatch: {} vs {}",
-                        a,
-                        b
-                    );
+                    assert!((a - b).abs() < 0.001, "float mismatch: {} vs {}", a, b);
                 }
                 _ => assert_eq!(original, converted, "round trip failed"),
             }
         }
     }
 }
-
-

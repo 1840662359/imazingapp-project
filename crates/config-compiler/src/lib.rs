@@ -235,13 +235,13 @@ pub fn load_and_compile(config_dir: &std::path::Path) -> Result<Arc<CompiledConf
 
     let read_json = |name: &str| -> Result<String> {
         let path = config_dir.join(name);
-        fs::read_to_string(&path).map_err(|e| {
-            Error::Config(format!("failed to read {}: {}", name, e))
-        })
+        fs::read_to_string(&path)
+            .map_err(|e| Error::Config(format!("failed to read {}: {}", name, e)))
     };
 
-    let versions: config_model::VersionsFile = serde_json::from_str(&read_json("versions.json")?)
-        .map_err(|e| Error::Config(format!("versions.json parse error: {}", e)))?;
+    let versions: config_model::VersionsFile =
+        serde_json::from_str(&read_json("versions.json")?)
+            .map_err(|e| Error::Config(format!("versions.json parse error: {}", e)))?;
 
     let targets: config_model::TargetsFile = serde_json::from_str(&read_json("targets.json")?)
         .map_err(|e| Error::Config(format!("targets.json parse error: {}", e)))?;
