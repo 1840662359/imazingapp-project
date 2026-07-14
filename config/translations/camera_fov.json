@@ -1,0 +1,7 @@
+{
+  "field_id": "camera_fov",
+  "target_id": "active_sav",
+  "address": "TpViewValue",
+  "value_type": "int",
+  "value_from_input": true
+}

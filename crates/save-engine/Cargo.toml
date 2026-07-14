@@ -1,0 +1,16 @@
+[package]
+name = "save-engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+domain.workspace = true
+tracing.workspace = true
+uesave = "0.7"
+
+[dev-dependencies]
+tempfile = "3"
+zip = "2"

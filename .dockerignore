@@ -1,0 +1,34 @@
+# Rust 构建产物
+target/
+*.pdb
+
+# Windows 专用工具链配置（Linux 容器内会导致 target triple 错误）
+rust-toolchain.toml
+.cargo/
+
+# IDE 文件
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# 文档
+*.md
+docs/
+
+# 日志
+*.log
+
+# 临时文件
+*.tmp
+.DS_Store
+
+# Node modules（如果有）
+node_modules/
+
+# 微信小程序
+miniprogram/

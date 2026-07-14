@@ -1,0 +1,59 @@
+# 和平精英 .imazingapp 生成器 —— Cargo Workspace 根
+#
+# 分层依赖方向（单向，禁止反向）：
+#   server → pipeline → {patch-engine, save-engine, ini-engine, zip-engine, config-compiler}
+#          → config-model → domain
+#
+# domain 是叶子 crate，任何 crate 均可依赖它。
+# 业务语义一律来自 config/，各 crate 只提供执行能力。
+
+[workspace]
+resolver = "3"
+members = [
+    "crates/domain",
+    "crates/config-model",
+    "crates/config-compiler",
+    "crates/save-engine",
+    "crates/ini-engine",
+    "crates/zip-engine",
+    "crates/template-engine",
+    "crates/patch-engine",
+    "crates/pipeline",
+    "crates/server",
+]
+
+# 所有 crate 共享的包级元数据
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "MIT"
+publish = false
+
+# 依赖版本集中管理：各 crate 用 `xxx.workspace = true` 引用
+[workspace.dependencies]
+# 内部 crate
+domain = { path = "crates/domain" }
+config-model = { path = "crates/config-model" }
+config-compiler = { path = "crates/config-compiler" }
+save-engine = { path = "crates/save-engine" }
+ini-engine = { path = "crates/ini-engine" }
+zip-engine = { path = "crates/zip-engine" }
+template-engine = { path = "crates/template-engine" }
+patch-engine = { path = "crates/patch-engine" }
+pipeline = { path = "crates/pipeline" }
+
+# 第三方依赖
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tokio = { version = "1", features = ["full"] }
+axum = "0.7"
+uuid = { version = "1", features = ["v4"] }
+async-trait = "0.1"
+
+[profile.release]
+lto = true
+codegen-units = 1

@@ -1,0 +1,33 @@
+<!-- pages/download/download.wxml -->
+<view class="container">
+  <!-- 生成成功 -->
+  <view wx:if="{{!error}}" class="success-container">
+    <view class="success-icon">✓</view>
+    <view class="success-title">生成成功</view>
+    <view class="success-desc">配置文件已准备好</view>
+
+    <view class="tip-card">
+      <view class="tip-icon">💡</view>
+      <view class="tip-text">建议将文件分享到文件传输助手，方便后续使用</view>
+    </view>
+
+    <button class="share-btn" type="primary" bindtap="onShare">
+      分享到微信
+    </button>
+
+    <button class="back-btn" bindtap="onBack">
+      返回重新配置
+    </button>
+  </view>
+
+  <!-- 出错状态 -->
+  <view wx:else class="error-container">
+    <view class="error-icon">⚠️</view>
+    <view class="error-title">出错了</view>
+    <view class="error-desc">{{error}}</view>
+
+    <button class="back-btn" type="primary" bindtap="onBack">
+      返回重新配置
+    </button>
+  </view>
+</view>

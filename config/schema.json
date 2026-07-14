@@ -1,0 +1,119 @@
+{
+  "fields": [
+    {
+      "id": "quality",
+      "type": "select",
+      "group": "画面",
+      "label": "画质",
+      "options": [
+        {"id": "smooth", "label": "流畅"},
+        {"id": "balanced", "label": "均衡"},
+        {"id": "hd", "label": "高清"}
+      ],
+      "default": "hd"
+    },
+    {
+      "id": "fps",
+      "type": "select",
+      "group": "性能",
+      "label": "帧率",
+      "options": [
+        {"id": "extreme", "label": "极限 (60帧)"},
+        {"id": "fps_90", "label": "90帧"},
+        {"id": "fps_120", "label": "120帧"}
+      ],
+      "default": "fps_120"
+    },
+    {
+      "id": "resolution_scale",
+      "type": "slider",
+      "group": "画面",
+      "label": "分辨率",
+      "min": 1.0,
+      "max": 2.0,
+      "step": 0.1,
+      "default": 2.0
+    },
+    {
+      "id": "visual_style",
+      "type": "select",
+      "group": "画面",
+      "label": "画面风格",
+      "options": [
+        {"id": "classic", "label": "经典"},
+        {"id": "vivid", "label": "鲜艳"},
+        {"id": "realistic", "label": "写实"},
+        {"id": "soft", "label": "柔和"},
+        {"id": "movie", "label": "电影"}
+      ],
+      "default": "vivid"
+    },
+    {
+      "id": "anti_aliasing",
+      "type": "switch",
+      "group": "画面",
+      "label": "抗锯齿",
+      "options": [
+        {"id": "on", "label": "开启"},
+        {"id": "off", "label": "关闭"}
+      ],
+      "default": "on"
+    },
+    {
+      "id": "shadow",
+      "type": "switch",
+      "group": "画面",
+      "label": "阴影",
+      "options": [
+        {"id": "on", "label": "开启"},
+        {"id": "off", "label": "关闭"}
+      ],
+      "default": "on"
+    },
+    {
+      "id": "render_optimization",
+      "type": "switch",
+      "group": "性能",
+      "label": "渲染优化",
+      "options": [
+        {"id": "on", "label": "开启"},
+        {"id": "off", "label": "关闭"}
+      ],
+      "default": "off"
+    },
+    {
+      "id": "brightness",
+      "type": "slider",
+      "group": "显示",
+      "label": "屏幕亮度",
+      "min": 0.8,
+      "max": 5.0,
+      "step": 0.1,
+      "default": 2.0,
+      "display_unit": "%",
+      "display_multiplier": 100
+    },
+    {
+      "id": "camera_fov",
+      "type": "slider",
+      "group": "视野",
+      "label": "第三人称镜头视野（调90即为“超广角”）",
+      "min": 80,
+      "max": 90,
+      "step": 1,
+      "default": 90
+    },
+    {
+      "id": "sprint_sensitivity",
+      "type": "slider",
+      "group": "操控",
+      "label": "冲刺灵敏度",
+      "min": 0.0,
+      "max": 10.0,
+      "step": 0.1,
+      "default": 1.0,
+      "display_unit": "%",
+      "display_multiplier": 100
+    }
+  ]
+}

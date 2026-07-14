@@ -1,0 +1,173 @@
+{
+  "bindings": {
+    "fps": [
+      {
+        "target": "user_ini",
+        "cvar": "r.PUBGDeviceFPSDef",
+        "value_type": "int",
+        "value_map": {"extreme": 60, "fps_90": 7, "fps_120": 8}
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.PUBGDeviceFPSLow",
+        "value_type": "int",
+        "value_map": {"extreme": 60, "fps_90": 7, "fps_120": 8}
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.PUBGDeviceFPSMid",
+        "value_type": "int",
+        "value_map": {"extreme": 60, "fps_90": 7, "fps_120": 8}
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.PUBGDeviceFPSHigh",
+        "value_type": "int",
+        "value_map": {"extreme": 60, "fps_90": 7, "fps_120": 8}
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.PUBGDeviceFPSHDR",
+        "value_type": "int",
+        "value_map": {"extreme": 60, "fps_90": 7, "fps_120": 8}
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.PUBGDeviceFPSUltralHigh",
+        "value_type": "int",
+        "value_map": {"extreme": 60, "fps_90": 7, "fps_120": 8}
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.PUBGDeviceFPSUltimateHigh",
+        "value_type": "int",
+        "value_map": {"extreme": 60, "fps_90": 7, "fps_120": 8}
+      },
+      {
+        "target": "active_sav",
+        "property": "FPSLevel",
+        "value_type": "int",
+        "value_map": {"extreme": 6, "fps_90": 7, "fps_120": 8}
+      },
+      {
+        "target": "active_sav",
+        "property": "FpsLevel_TA",
+        "value_type": "int",
+        "value_map": {"extreme": 6, "fps_90": 7, "fps_120": 8}
+      }
+    ],
+    "quality": [
+      {
+        "target": "user_ini",
+        "cvar": "r.UserQualitySetting",
+        "value_type": "int",
+        "value_map": {"smooth": 0, "balanced": 1, "hd": 2}
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.UserQualitySettingTA",
+        "value_type": "int",
+        "value_map": {"smooth": 0, "balanced": 1, "hd": 2}
+      }
+    ],
+    "resolution_scale": [
+      {
+        "target": "user_ini",
+        "cvar": "r.MobileContentScaleFactor",
+        "value_type": "float",
+        "value_from_input": true
+      }
+    ],
+    "visual_style": [
+      {
+        "target": "user_ini",
+        "cvar": "r.UserHDRSetting",
+        "value_type": "int",
+        "value_map": {
+          "classic": 1,
+          "vivid": 2,
+          "realistic": 3,
+          "soft": 4,
+          "movie": 6
+        }
+      }
+    ],
+    "anti_aliasing": [
+      {
+        "target": "user_ini",
+        "cvar": "r.UserMSAASetting",
+        "value_type": "int",
+        "value_map": {"off": 0, "on": 1}
+      }
+    ],
+    "shadow": [
+      {
+        "target": "user_ini",
+        "cvar": "r.UserShadowSwitch",
+        "value_type": "int",
+        "value_map": {"off": 0, "on": 1}
+      }
+    ],
+    "brightness": [
+      {
+        "target": "active_sav",
+        "property": "ScreenLightness",
+        "value_type": "float",
+        "value_from_input": true
+      }
+    ],
+    "camera_fov": [
+      {
+        "target": "active_sav",
+        "property": "TpViewValue",
+        "value_type": "int",
+        "value_from_input": true
+      }
+    ],
+    "sprint_sensitivity": [
+      {
+        "target": "active_sav",
+        "property": "JoystickSprintParam",
+        "value_type": "float",
+        "value_from_input": true
+      }
+    ],
+    "render_optimization": [
+      {
+        "target": "user_ini",
+        "cvar": "r.BloomQuality",
+        "value_type": "float",
+        "value_map": {"on": 0.0},
+        "remove_when": "off"
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.LightShaftQuality",
+        "value_type": "float",
+        "value_map": {"on": 0.0},
+        "remove_when": "off"
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.Mobile.TonemapperFilm",
+        "value_type": "int",
+        "value_map": {"on": 0},
+        "remove_when": "off"
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.Mobile.AlwaysResolveDepth",
+        "value_type": "int",
+        "value_map": {"on": 0},
+        "remove_when": "off"
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.MobileSimpleShader",
+        "value_type": "int",
+        "value_map": {"on": 1},
+        "remove_when": "off"
+      }
+    ]
+  }
+}

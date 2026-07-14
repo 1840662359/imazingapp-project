@@ -1,0 +1,10 @@
+# 显式指定 GNU 工具链（WinLibs mingw-w64）的链接器与 dlltool。
+#
+# - linker：gcc 会在自身目录解析 as/ld 等同伴工具。
+# - -C dlltool：rustc 生成导入库时直接按名调用 dlltool.exe 并在 PATH 查找，
+#   默认 PATH 不含 mingw bin，故显式给出完整路径，使 `cargo build` 无需改 PATH。
+[target.x86_64-pc-windows-gnu]
+linker = "C:\\Users\\wql\\AppData\\Local\\Microsoft\\WinGet\\Packages\\BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\mingw64\\bin\\gcc.exe"
+rustflags = [
+    "-Cdlltool=C:\\Users\\wql\\AppData\\Local\\Microsoft\\WinGet\\Packages\\BrechtSanders.WinLibs.POSIX.UCRT_Microsoft.Winget.Source_8wekyb3d8bbwe\\mingw64\\bin\\dlltool.exe",
+]

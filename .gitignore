@@ -1,0 +1,23 @@
+# Rust
+/target
+**/target
+Cargo.lock.bak
+
+# 微信小程序
+miniprogram/project.private.config.json
+miniprogram/node_modules
+
+# Claude 会话/记忆数据
+.claude/
+
+# IDE / 系统
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# 日志与临时
+*.log
+tmp/
+temp/

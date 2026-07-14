@@ -1,0 +1,7 @@
+{
+  "field_id": "resolution_scale",
+  "target_id": "user_ini",
+  "address": "r.MobileContentScaleFactor",
+  "value_type": "float",
+  "value_from_input": true
+}

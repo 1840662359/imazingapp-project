@@ -1,0 +1,13 @@
+{
+  "field_id": "visual_style",
+  "target_id": "user_ini",
+  "address": "r.UserHDRSetting",
+  "value_type": "int",
+  "value_map": {
+    "classic": 1,
+    "vivid": 2,
+    "realistic": 3,
+    "soft": 4,
+    "movie": 6
+  }
+}

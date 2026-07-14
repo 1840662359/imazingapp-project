@@ -1,0 +1,188 @@
+{
+  "field_id": "fps",
+  "rules": [
+    {
+      "when": "@fps == 'extreme'",
+      "ops": [
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSDef",
+          "value": "60"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSLow",
+          "value": "60"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSMid",
+          "value": "60"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSHigh",
+          "value": "60"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSHDR",
+          "value": "60"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSUltralHigh",
+          "value": "60"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSUltimateHigh",
+          "value": "60"
+        },
+        {
+          "target_id": "active_sav",
+          "action": "set",
+          "address": "FPSLevel",
+          "value_type": "int",
+          "value": 6
+        },
+        {
+          "target_id": "active_sav",
+          "action": "set",
+          "address": "FpsLevel_TA",
+          "value_type": "int",
+          "value": 6
+        }
+      ]
+    },
+    {
+      "when": "@fps == 'fps_90'",
+      "ops": [
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSDef",
+          "value": "7"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSLow",
+          "value": "7"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSMid",
+          "value": "7"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSHigh",
+          "value": "7"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSHDR",
+          "value": "7"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSUltralHigh",
+          "value": "7"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSUltimateHigh",
+          "value": "7"
+        },
+        {
+          "target_id": "active_sav",
+          "action": "set",
+          "address": "FPSLevel",
+          "value_type": "int",
+          "value": 7
+        },
+        {
+          "target_id": "active_sav",
+          "action": "set",
+          "address": "FpsLevel_TA",
+          "value_type": "int",
+          "value": 7
+        }
+      ]
+    },
+    {
+      "when": "@fps == 'fps_120'",
+      "ops": [
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSDef",
+          "value": "8"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSLow",
+          "value": "8"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSMid",
+          "value": "8"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSHigh",
+          "value": "8"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSHDR",
+          "value": "8"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSUltralHigh",
+          "value": "8"
+        },
+        {
+          "target_id": "user_ini",
+          "action": "set",
+          "key": "r.PUBGDeviceFPSUltimateHigh",
+          "value": "8"
+        },
+        {
+          "target_id": "active_sav",
+          "action": "set",
+          "address": "FPSLevel",
+          "value_type": "int",
+          "value": 8
+        },
+        {
+          "target_id": "active_sav",
+          "action": "set",
+          "address": "FpsLevel_TA",
+          "value_type": "int",
+          "value": 8
+        }
+      ]
+    }
+  ]
+}

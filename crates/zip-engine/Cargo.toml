@@ -1,0 +1,12 @@
+[package]
+name = "zip-engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+domain.workspace = true
+tracing.workspace = true
+# NOTE: 后续接入 zip crate 做流式拆包/重打包；骨架阶段不引入以保证可构建。

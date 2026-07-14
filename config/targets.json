@@ -1,0 +1,13 @@
+{
+  "targets": {
+    "active_sav": {
+      "kind": "save",
+      "zip_path": "Container/Documents/ShadowTrackerExtra/Saved/SaveGames/Active.sav"
+    },
+    "user_ini": {
+      "kind": "ini",
+      "zip_path": "Container/Documents/ShadowTrackerExtra/Saved/Config/IOS/UserCustom.ini",
+      "section": "[UserCustom DeviceProfile]"
+    }
+  }
+}

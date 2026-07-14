@@ -1,0 +1,53 @@
+<!-- components/dynamic-field/dynamic-field.wxml -->
+<view class="field-container">
+  <!-- 字段标签 -->
+  <view class="field-label">{{field.label}}</view>
+
+  <!-- Select 类型 -->
+  <picker wx:if="{{field.type === 'select'}}"
+          mode="selector"
+          range="{{field.options}}"
+          range-key="label"
+          value="{{selectedIndex}}"
+          bindchange="onPickerChange"
+          class="picker-container">
+    <view class="picker">
+      <text class="picker-text">{{currentLabel}}</text>
+      <text class="picker-arrow">›</text>
+    </view>
+  </picker>
+
+  <!-- Slider 类型 -->
+  <view wx:elif="{{field.type === 'slider'}}" class="slider-container">
+    <slider
+      min="{{field.min}}"
+      max="{{field.max}}"
+      step="{{field.step}}"
+      value="{{value}}"
+      show-value="{{false}}"
+      bindchange="onSliderChange"
+      bindchanging="onSliderChanging"
+    />
+    <view class="slider-value">{{displayValue}}</view>
+  </view>
+
+  <!-- Switch 类型 -->
+  <switch wx:elif="{{field.type === 'switch'}}"
+          checked="{{switchChecked}}"
+          bindchange="onSwitchChange"
+  />
+
+  <!-- Input 类型 -->
+  <input wx:elif="{{field.type === 'input'}}"
+         type="{{field.inputType || 'text'}}"
+         value="{{value}}"
+         placeholder="{{field.placeholder || ''}}"
+         bindinput="onInputChange"
+         class="field-input"
+  />
+
+  <!-- 不支持的类型 -->
+  <view wx:else class="unsupported">
+    不支持的字段类型: {{field.type}}
+  </view>
+</view>

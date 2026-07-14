@@ -1,0 +1,44 @@
+<!-- pages/index/index.wxml -->
+<view class="container">
+  <!-- 加载中 -->
+  <view wx:if="{{loading}}" class="loading">
+    <view class="loading-text">加载配置中...</view>
+  </view>
+
+  <!-- 加载失败 -->
+  <view wx:elif="{{error}}" class="error">
+    <view class="error-icon">⚠️</view>
+    <view class="error-text">{{error}}</view>
+    <button class="retry-btn" bindtap="loadSchema">重试</button>
+  </view>
+
+  <!-- 配置表单 -->
+  <view wx:else class="form-container">
+    <!-- 动态字段 -->
+    <view class="fields-section">
+      <view class="section-title">自定义配置</view>
+      <view class="fields-list">
+        <dynamic-field
+          wx:for="{{fields}}"
+          wx:key="id"
+          field="{{item}}"
+          value="{{selections[item.id]}}"
+          bindchange="onFieldChange"
+        />
+      </view>
+    </view>
+
+    <!-- 生成按钮 -->
+    <view class="actions">
+      <button
+        class="generate-btn"
+        type="primary"
+        bindtap="onGenerate"
+        loading="{{generating}}"
+        disabled="{{generating}}"
+      >
+        {{generating ? '生成中...' : '生成配置文件'}}
+      </button>
+    </view>
+  </view>
+</view>

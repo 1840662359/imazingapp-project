@@ -1,0 +1,18 @@
+[package]
+name = "pipeline"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+domain = { path = "../domain" }
+config-model = { path = "../config-model" }
+config-compiler = { path = "../config-compiler" }
+patch-engine = { path = "../patch-engine" }
+save-engine = { path = "../save-engine" }
+ini-engine = { path = "../ini-engine" }
+template-engine = { path = "../template-engine" }
+serde_json = "1"
+thiserror = "2.0"
+tracing = "0.1"
+
+[dev-dependencies]

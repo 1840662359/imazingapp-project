@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "画质文件云生成大师",
+  "usingComponents": {
+    "dynamic-field": "/components/dynamic-field/dynamic-field"
+  }
+}
