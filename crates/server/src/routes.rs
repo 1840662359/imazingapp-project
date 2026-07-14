@@ -3,12 +3,18 @@
 //! 所有 handler 调用 Service trait，不直接实现业务逻辑。
 
 use std::sync::Arc;
+use std::time::Duration;
 
 use axum::extract::State;
 use axum::http::{StatusCode, header};
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, post};
 use axum::{Json, Router};
+use tokio::sync::Semaphore;
+
+/// 等待构建许可的最长时间。超时说明实例已饱和，返回 503 让客户端重试、
+/// 平台按 CPU 使用率触发扩容，而不是无限排队把请求拖到超时。
+const BUILD_ACQUIRE_TIMEOUT: Duration = Duration::from_secs(20);
 
 use domain::selection::{Selection, Selections};
 
@@ -136,6 +142,9 @@ fn generate_filename(selections: &Selections) -> String {
 pub struct AppState {
     pub config_service: Arc<dyn ConfigService>,
     pub build_service: Arc<dyn BuildService>,
+    /// 构建并发闸门：限制同时进行的 CPU 密集型 build 数量。
+    /// 大小应与容器核数对齐，避免过多并发同时 deflate 导致 CPU 抖动与内存峰值。
+    pub build_semaphore: Arc<Semaphore>,
 }
 
 /// 构建路由表
@@ -192,13 +201,26 @@ async fn build(
         return Err(AppError::validation("必须提供 preset_id 或 selections"));
     };
 
-    // 2. 调用构建服务
+    // 2. 获取构建许可（并发闸门）。等待超时说明实例已饱和，
+    //    返回 503 让客户端稍后重试，同时高 CPU 触发平台扩容。
+    let _permit = match tokio::time::timeout(
+        BUILD_ACQUIRE_TIMEOUT,
+        state.build_semaphore.clone().acquire_owned(),
+    )
+    .await
+    {
+        Ok(Ok(permit)) => permit,
+        Ok(Err(_)) => return Err(AppError::internal("构建闸门已关闭")),
+        Err(_) => return Err(AppError::unavailable("服务繁忙，请稍后重试")),
+    };
+
+    // 3. 调用构建服务（许可持有至本次请求结束）
     let bytes = state.build_service.build(&selections).await?;
 
-    // 3. 生成文件名
+    // 4. 生成文件名
     let filename = generate_filename(&selections);
 
-    // 4. 直接返回二进制文件
+    // 5. 直接返回二进制文件
     let content_disposition = format!("attachment; filename=\"{}\"", filename);
 
     Ok((
@@ -273,6 +295,13 @@ impl AppError {
         Self {
             status: StatusCode::INTERNAL_SERVER_ERROR,
             response: ErrorResponse::internal_error(message),
+        }
+    }
+
+    pub fn unavailable(message: impl Into<String>) -> Self {
+        Self {
+            status: StatusCode::SERVICE_UNAVAILABLE,
+            response: ErrorResponse::new("service_unavailable", message),
         }
     }
 }

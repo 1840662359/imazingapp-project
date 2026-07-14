@@ -69,13 +69,10 @@ impl TemplateEngine {
                 .map_err(|e| Error::Template(format!("read entry {} failed: {}", i, e)))?;
 
             let entry_path = entry.name().to_string();
-            let is_dir = entry.is_dir();
-            let compression = entry.compression();
 
             // 目录条目直接复制
-            if is_dir {
-                let options =
-                    zip::write::FileOptions::<()>::default().compression_method(compression);
+            if entry.is_dir() {
+                let options = zip::write::FileOptions::<()>::default();
                 output_zip
                     .add_directory(&entry_path, options)
                     .map_err(|e| {
@@ -84,18 +81,13 @@ impl TemplateEngine {
                 continue;
             }
 
-            // 文件条目
-            let options = zip::write::FileOptions::<()>::default()
-                .compression_method(compression)
-                .unix_permissions(entry.unix_mode().unwrap_or(0o644));
-
-            output_zip
-                .start_file(&entry_path, options)
-                .map_err(|e| Error::Template(format!("start file {} failed: {}", entry_path, e)))?;
-
             // 判断是否需要转换
             if let Some(transformer) = transformers.get(&entry_path) {
-                // 读取 → 转换 → 写入
+                // 需要改写的 entry（Active.sav / UserCustom.ini）：
+                // 解出原始字节 → 转换 → 以 Stored（不压缩）写回。
+                // 这两个文件本就很小，改用 Stored 省掉一次 deflate，降低单请求 CPU。
+                let mode = entry.unix_mode().unwrap_or(0o644);
+
                 let mut original_bytes = Vec::new();
                 entry
                     .read_to_end(&mut original_bytes)
@@ -103,13 +95,21 @@ impl TemplateEngine {
 
                 let transformed_bytes = transformer(&original_bytes)?;
 
+                let options = zip::write::FileOptions::<()>::default()
+                    .compression_method(zip::CompressionMethod::Stored)
+                    .unix_permissions(mode);
+                output_zip.start_file(&entry_path, options).map_err(|e| {
+                    Error::Template(format!("start file {} failed: {}", entry_path, e))
+                })?;
                 output_zip
                     .write_all(&transformed_bytes)
                     .map_err(|e| Error::Template(format!("write {} failed: {}", entry_path, e)))?;
             } else {
-                // 直接复制字节流
-                std::io::copy(&mut entry, &mut output_zip)
-                    .map_err(|e| Error::Template(format!("copy {} failed: {}", entry_path, e)))?;
+                // 未改动的 entry：直接复制已压缩的原始数据，跳过「解压 + 重新压缩」，
+                // 这是单请求最大的 CPU 节省点（模板里绝大多数文件都不改）。
+                output_zip.raw_copy_file(entry).map_err(|e| {
+                    Error::Template(format!("raw copy {} failed: {}", entry_path, e))
+                })?;
             }
         }
 

@@ -9,6 +9,7 @@ mod service;
 use std::net::SocketAddr;
 use std::sync::Arc;
 
+use tokio::sync::Semaphore;
 use tracing::info;
 
 use crate::mock_service::{MockBuildService, MockConfigService};
@@ -29,6 +30,22 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .and_then(|v| v.parse::<bool>().ok())
         .unwrap_or(false);
 
+    // 构建并发上限：CPU 密集型 build 的同时执行数量。
+    // 应与容器核数对齐（1 核容器设 1，多留一点重叠可设 2）。
+    // 通过 BUILD_CONCURRENCY 覆盖，默认按可用并行度、并夹在 [1, 4]。
+    let build_concurrency = std::env::var("BUILD_CONCURRENCY")
+        .ok()
+        .and_then(|v| v.parse::<usize>().ok())
+        .filter(|&n| n > 0)
+        .unwrap_or_else(|| {
+            std::thread::available_parallelism()
+                .map(|n| n.get())
+                .unwrap_or(1)
+                .clamp(1, 4)
+        });
+    info!("构建并发上限: {}", build_concurrency);
+    let build_semaphore = Arc::new(Semaphore::new(build_concurrency));
+
     let state = if use_real {
         info!("使用 Real Service（生产模式）");
 
@@ -48,6 +65,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         AppState {
             config_service: Arc::new(RealConfigService::new(config.clone())),
             build_service: Arc::new(RealBuildService::new(config.clone(), template_bytes)),
+            build_semaphore,
         }
     } else {
         info!("使用 Mock Service（开发模式）");
@@ -55,6 +73,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         AppState {
             config_service: Arc::new(MockConfigService),
             build_service: Arc::new(MockBuildService),
+            build_semaphore,
         }
     };
 

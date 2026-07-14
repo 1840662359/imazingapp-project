@@ -117,8 +117,18 @@ impl BuildService for RealBuildService {
     async fn build(&self, selections: &Selections) -> Result<Vec<u8>> {
         tracing::info!("构建 .imazingapp，选择数量: {}", selections.len());
 
-        // 调用 Pipeline 生成
-        let result = pipeline::generate(&self.config, selections, &self.template_bytes)?;
+        // pipeline::generate 是纯 CPU 的同步操作（解 zip → 解析 GVAS → 改写 → 重新打包）。
+        // 放到 spawn_blocking 专用线程池执行，避免占死 tokio 异步工作线程、
+        // 拖垮 /health 与 /schema 等轻量接口。
+        let config = self.config.clone();
+        let template = self.template_bytes.clone();
+        let selections = selections.clone();
+
+        let result = tokio::task::spawn_blocking(move || {
+            pipeline::generate(&config, &selections, &template)
+        })
+        .await
+        .map_err(|e| Error::Internal(format!("build task join failed: {}", e)))??;
 
         tracing::info!("生成完成，输出大小: {} 字节", result.len());
         Ok(result)
