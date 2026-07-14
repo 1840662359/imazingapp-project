@@ -35,11 +35,13 @@ fn generate_filename(selections: &Selections) -> String {
     // 1. 分辨率（resolution_scale: 1.0-2.0）
     if let Some(Selection::Raw(value)) = selections.get("resolution_scale") {
         if let Some(resolution) = value.as_f64() {
-            // 保留小数：1.7 -> "1.7K"；整数则去掉 .0：2.0 -> "2K"
+            // 保留小数：1.7 -> "1.7K"；整数则去掉 .0：2.0 -> "2K"。
+            // 注意 f64 精度：1.7 实际存为 1.7000000000000002，
+            // 步进为 0.1，用 {:.1} 保留一位小数即可精确显示、避免长串 0。
             if (resolution.fract()).abs() < f64::EPSILON {
                 filename.push_str(&format!("{}K", resolution as i32));
             } else {
-                filename.push_str(&format!("{}K", resolution));
+                filename.push_str(&format!("{:.1}K", resolution));
             }
         }
     }
