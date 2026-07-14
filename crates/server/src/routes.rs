@@ -325,3 +325,85 @@ impl IntoResponse for AppError {
         (self.status, Json(self.response)).into_response()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// 便捷构造：滑块类字段（原始数值）。
+    fn raw(v: f64) -> Selection {
+        Selection::Raw(serde_json::json!(v))
+    }
+
+    /// 便捷构造：选项类字段。
+    fn opt(id: &str) -> Selection {
+        Selection::Option(id.to_string())
+    }
+
+    #[test]
+    fn filename_full_combo() {
+        let mut s = Selections::new();
+        s.insert("resolution_scale".into(), raw(2.0));
+        s.insert("quality".into(), opt("hd"));
+        s.insert("fps".into(), opt("fps_120"));
+        s.insert("visual_style".into(), opt("vivid"));
+        s.insert("anti_aliasing".into(), opt("on"));
+        s.insert("shadow".into(), opt("off"));
+        s.insert("render_optimization".into(), opt("on"));
+        s.insert("brightness".into(), raw(2.0));
+        s.insert("sprint_sensitivity".into(), raw(1.0));
+        s.insert("camera_fov".into(), raw(90.0));
+
+        assert_eq!(
+            generate_filename(&s),
+            "2K高清120帧鲜艳抗锯齿开阴影关渲染优化开200%亮度100%冲刺超广角.imazingapp"
+        );
+    }
+
+    #[test]
+    fn filename_resolution_decimal_no_float_noise() {
+        // 回归：1.7 存为 f64 是 1.7000000000000002，必须显示为 1.7K
+        let mut s = Selections::new();
+        s.insert("resolution_scale".into(), raw(1.7));
+        let name = generate_filename(&s);
+        assert!(name.starts_with("1.7K"), "实际: {}", name);
+        assert!(!name.contains("1.70000"), "不应出现浮点噪声: {}", name);
+    }
+
+    #[test]
+    fn filename_resolution_integer_drops_decimal() {
+        let mut s = Selections::new();
+        s.insert("resolution_scale".into(), raw(2.0));
+        assert!(generate_filename(&s).starts_with("2K"));
+    }
+
+    #[test]
+    fn filename_fov_boundary() {
+        // 视野 = 80 不加超广角；> 80 才加
+        let mut at_80 = Selections::new();
+        at_80.insert("camera_fov".into(), raw(80.0));
+        assert!(!generate_filename(&at_80).contains("超广角"));
+
+        let mut above_80 = Selections::new();
+        above_80.insert("camera_fov".into(), raw(81.0));
+        assert!(generate_filename(&above_80).contains("超广角"));
+    }
+
+    #[test]
+    fn filename_switch_off_states() {
+        let mut s = Selections::new();
+        s.insert("anti_aliasing".into(), opt("off"));
+        s.insert("shadow".into(), opt("off"));
+        s.insert("render_optimization".into(), opt("off"));
+        let name = generate_filename(&s);
+        assert!(name.contains("抗锯齿关"));
+        assert!(name.contains("阴影关"));
+        assert!(name.contains("渲染优化关"));
+    }
+
+    #[test]
+    fn filename_always_has_extension() {
+        let s = Selections::new();
+        assert_eq!(generate_filename(&s), ".imazingapp");
+    }
+}
