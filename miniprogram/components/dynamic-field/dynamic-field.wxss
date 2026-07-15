@@ -61,6 +61,42 @@
   font-weight: 500;
 }
 
+/* Switch：标签在左、状态文字 + 开关在右，同一行 */
+.switch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.switch-label {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.switch-control {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.switch-state {
+  font-size: 26rpx;
+}
+
+.switch-state.on {
+  color: #07c160;
+}
+
+.switch-state.off {
+  color: #999;
+}
+
+/* 缩小微信默认开关，与卡片比例更协调 */
+.switch-control switch {
+  transform: scale(0.85);
+}
+
 /* Input */
 .field-input {
   padding: 20rpx 30rpx;

@@ -1,7 +1,7 @@
 <!-- components/dynamic-field/dynamic-field.wxml -->
 <view class="field-container">
-  <!-- 字段标签 -->
-  <view class="field-label">{{field.label}}</view>
+  <!-- 字段标签（switch 类型改为与开关同行显示，见下方 switch-row） -->
+  <view wx:if="{{field.type !== 'switch'}}" class="field-label">{{field.label}}</view>
 
   <!-- Select 类型 -->
   <picker wx:if="{{field.type === 'select'}}"
@@ -31,11 +31,14 @@
     <view class="slider-value">{{displayValue}}</view>
   </view>
 
-  <!-- Switch 类型 -->
-  <switch wx:elif="{{field.type === 'switch'}}"
-          checked="{{switchChecked}}"
-          bindchange="onSwitchChange"
-  />
+  <!-- Switch 类型：标签在左，状态文字 + 开关在右，整体一行 -->
+  <view wx:elif="{{field.type === 'switch'}}" class="switch-row">
+    <text class="switch-label">{{field.label}}</text>
+    <view class="switch-control">
+      <text class="switch-state {{switchChecked ? 'on' : 'off'}}">{{switchChecked ? '已开启' : '已关闭'}}</text>
+      <switch checked="{{switchChecked}}" color="#07c160" bindchange="onSwitchChange" />
+    </view>
+  </view>
 
   <!-- Input 类型 -->
   <input wx:elif="{{field.type === 'input'}}"
