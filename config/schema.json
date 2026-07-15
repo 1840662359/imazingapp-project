@@ -95,13 +95,14 @@
     },
     {
       "id": "camera_fov",
-      "type": "slider",
+      "type": "switch",
       "group": "视野",
-      "label": "第三人称镜头视野（调90即为“超广角”）",
-      "min": 80,
-      "max": 90,
-      "step": 1,
-      "default": 90
+      "label": "超广角",
+      "options": [
+        {"id": "on", "label": "开启"},
+        {"id": "off", "label": "关闭"}
+      ],
+      "default": "on"
     },
     {
       "id": "sprint_sensitivity",

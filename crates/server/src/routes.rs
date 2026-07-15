@@ -27,8 +27,8 @@ use crate::service::{BuildService, ConfigService};
 
 /// 根据用户选择生成文件名
 ///
-/// 格式：<分辨率>K<画质><帧率><画面风格><屏幕亮度>亮度<冲刺灵敏度>冲刺<若视野大于80则加上超广角>
-/// 例如：2K高清120帧鲜艳200%亮度100%冲刺超广角
+/// 格式：<分辨率>K<画质><帧率><画面风格><抗锯齿><阴影><渲染优化><亮度>亮度<冲刺灵敏度>冲刺<超广角开启则加>
+/// 例如：2K高清120帧鲜艳抗锯齿开阴影关渲染优化开200%亮度100%冲刺超广角
 fn generate_filename(selections: &Selections) -> String {
     let mut filename = String::new();
 
@@ -124,12 +124,10 @@ fn generate_filename(selections: &Selections) -> String {
         }
     }
 
-    // 7. 超广角（camera_fov > 80）
-    if let Some(Selection::Raw(value)) = selections.get("camera_fov") {
-        if let Some(fov) = value.as_f64() {
-            if fov > 80.0 {
-                filename.push_str("超广角");
-            }
+    // 7. 超广角（camera_fov: on/off）
+    if let Some(Selection::Option(fov)) = selections.get("camera_fov") {
+        if fov == "on" {
+            filename.push_str("超广角");
         }
     }
 
@@ -352,7 +350,7 @@ mod tests {
         s.insert("render_optimization".into(), opt("on"));
         s.insert("brightness".into(), raw(2.0));
         s.insert("sprint_sensitivity".into(), raw(1.0));
-        s.insert("camera_fov".into(), raw(90.0));
+        s.insert("camera_fov".into(), opt("on"));
 
         assert_eq!(
             generate_filename(&s),
@@ -378,15 +376,15 @@ mod tests {
     }
 
     #[test]
-    fn filename_fov_boundary() {
-        // 视野 = 80 不加超广角；> 80 才加
-        let mut at_80 = Selections::new();
-        at_80.insert("camera_fov".into(), raw(80.0));
-        assert!(!generate_filename(&at_80).contains("超广角"));
+    fn filename_fov_switch() {
+        // 超广角为开关：off 不加、on 加
+        let mut off = Selections::new();
+        off.insert("camera_fov".into(), opt("off"));
+        assert!(!generate_filename(&off).contains("超广角"));
 
-        let mut above_80 = Selections::new();
-        above_80.insert("camera_fov".into(), raw(81.0));
-        assert!(generate_filename(&above_80).contains("超广角"));
+        let mut on = Selections::new();
+        on.insert("camera_fov".into(), opt("on"));
+        assert!(generate_filename(&on).contains("超广角"));
     }
 
     #[test]

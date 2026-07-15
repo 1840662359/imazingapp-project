@@ -121,7 +121,7 @@
         "target": "active_sav",
         "property": "TpViewValue",
         "value_type": "int",
-        "value_from_input": true
+        "value_map": {"on": 225, "off": 80}
       }
     ],
     "sprint_sensitivity": [
