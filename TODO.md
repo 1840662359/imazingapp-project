@@ -1,13 +1,40 @@
 # TODO · 项目进度
 
-> 当前阶段：已上线（真机验证通过 + 微信审核发布），进入运营优化阶段
+> 当前阶段：纯前端单机方案已实现，待真机验收与发布
 
 ## ✅ 已完成
 
-### Rust 后端
+### 纯前端单机迁移（核心架构变更）
+
+-   [x] 方案确认：配置 + 模板全内嵌，零服务器（docs/pure-frontend-design.md）
+    - 完成时间: 2026-08-20
+    - 修改文件: docs/pure-frontend-design.md
+-   [x] devtools crate：模板预处理（Stored 化）+ 扫描断言 + golden 生成
+    - 完成时间: 2026-08-20
+    - 修改文件: crates/devtools/*, Cargo.toml
+-   [x] GVAS 布局实测校准：88 个属性定位全部验证（devtools dump --scan）
+    - 完成时间: 2026-08-20
+    - 修改文件: crates/devtools/src/dump.rs
+-   [x] JS engine 模块：config/translate/ini/sav/zip/filename/generate
+    - 完成时间: 2026-08-20
+    - 修改文件: miniprogram/engine/*
+-   [x] Node 单测对照 golden：18/18 通过（条目级 name/method/size/crc32）
+    - 完成时间: 2026-08-20
+    - 修改文件: miniprogram/engine/test/engine.test.js
+-   [x] 页面改造：index.js 改调本地生成（无网络请求）
+    - 完成时间: 2026-08-20
+    - 修改文件: miniprogram/pages/index/index.js
+-   [x] 服务端清理：删除 crates/server、Dockerfile、translations 死数据
+    - 完成时间: 2026-08-20
+    - 修改文件: crates/server/*, Dockerfile, config/translations/*
+-   [x] CI 更新：去掉 Docker 校验，加入模板预处理 + golden + Node 对照
+    - 完成时间: 2026-08-20
+    - 修改文件: .github/workflows/ci.yml
+
+### Rust 后端（原线上版本，保留为开发期 oracle）
 
 -   [x] Rust Workspace 架构完成
--   [x] 10 个 crate 模块拆分完成
+-   [x] 10 个 crate 模块拆分完成（server 已随迁移移除）
 -   [x] 配置中心完成
 -   [x] schema/patch/target/translation 加载完成
 -   [x] Patch Engine 完成
@@ -44,32 +71,12 @@
 -   [x] 配置选择页面
 -   [x] 下载/分享页面
 -   [x] 文件分享流程
--   [x] 后端 API 对接（改用 wx.cloud.callContainer）
+-   [x] 后端 API 对接（改用 wx.cloud.callContainer，已随迁移废弃）
 -   [x] 本地缓存最新文件，支持反复分享
 -   [x] 生成按钮 5 秒冷却防刷
+-   [x] 激励视频广告解锁分享（完整观看后 24 小时免广告）
 
-------------------------------------------------------------------------
-
-## 🔴 上线前任务
-
-### 部署
-
--   [x] 完成微信云托管部署
--   [x] 小程序改用 wx.cloud.callContainer（免配合法域名）
-
-### 存储
-
-已通过架构变更移除存储层：
-
--   `/build` 直接返回文件字节，服务端不落地
--   小程序本地缓存最新文件用于分享
--   服务端无状态，可多实例横向扩容，无重启丢失问题
-
-原「接入对象存储 / Redis 任务状态」计划随之取消（不再需要）。
-
-------------------------------------------------------------------------
-
-## ✅ 真机验证与上线（已完成）
+### 真机验证与上线（原线上版本）
 
 -   [x] 完整测试生成流程
 -   [x] iMazing 导入测试
@@ -78,31 +85,25 @@
 
 ------------------------------------------------------------------------
 
-## 🟢 后续优化
+## 🟢 后续任务
 
-### Save Engine
+### 纯前端方案收尾（当前优先级）
+
+-   [x] 真机验收：本地生成 + 分享链路验证通过
+    - 完成时间: 2026-08-20
+    - 修复: schema 本地加载、模板 base64 内嵌、writeFileSync ArrayBuffer 转换
+-   [ ] 微信审核发布（纯前端版本）
+-   [ ] `zip-engine` crate 无人依赖：删除或保留待定（删除属架构调整，需同步 CLAUDE.md）
+
+### Save Engine（oracle 侧）
 
 -   [ ] 支持枚举属性写入
 -   [ ] 支持新增属性
 -   [ ] 增强 UE Save 格式兼容
 
-### 技术债
-
--   [ ] `zip-engine` crate 目前无人依赖（pipeline 直接用 `zip` crate）。
-    保留还是删除待定——删除属架构调整，需同步 CLAUDE.md。
-
-### 服务能力
-
--   [ ] 日志监控
--   [ ] 错误追踪
-
-> 注：Redis 分布式限流 / 任务状态持久化已不再需要——限流已移除、
-> 服务端已无状态（见「存储」章节）。
-
 ### 商业化
 
--   [ ] 激励广告
--   [ ] 下载统计
+-   [ ] 下载统计（本地事件上报，如可接受静态托管）
 -   [ ] 用户体系
 
 ------------------------------------------------------------------------
@@ -117,8 +118,10 @@
        ↓
     修改 config/
        ↓
-    验证 Schema
+    node scripts/build-config.js
        ↓
-    复用 Engine
+    devtools scan / golden + Node 测试
+       ↓
+    复用 Engine（小程序本地生成）
 
 只有当出现新的执行能力时，才新增 Engine。

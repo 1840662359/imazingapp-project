@@ -41,8 +41,9 @@ Component({
       const { field, value } = this.properties;
 
       if (field.type === 'select') {
-        // 找到当前选中项的索引
-        const index = field.options?.findIndex(opt => opt.id === value) || 0;
+        // 找到当前选中项的索引（未匹配时兜底到 0，避免 -1 越界）
+        const idx = field.options?.findIndex(opt => opt.id === value) ?? -1;
+        const index = idx >= 0 ? idx : 0;
         const label = field.options?.[index]?.label || '请选择';
         this.setData({
           selectedIndex: index,

@@ -13,20 +13,21 @@
         ↓
 schema 动态生成 UI
         ↓
-提交配置参数
+小程序本地生成（engine/generate.js）
         ↓
-Rust 后端 Pipeline
+translate → PatchOp
         ↓
-Patch Engine
+Save / Ini 修改（sav.js / ini.js）
         ↓
-Save / Ini 修改
+zip 字节重写（zip.js）
         ↓
-Template Engine
+生成 .imazingapp（写本地缓存）
         ↓
-生成 .imazingapp
-        ↓
-用户通过 iMazing 导入设备
+分享到微信 → iMazing 导入设备
 ```
+
+纯前端单机方案：无服务端。Rust Workspace 保留为**开发期 oracle**
+（golden 基准 + 模板预处理），不部署、不进包。
 
 本项目不是传统 CRUD 项目。
 
@@ -134,7 +135,7 @@ match option {
 整体依赖方向：
 
 ```
-server
+devtools（开发期工具）
 
     ↓
 
@@ -163,6 +164,9 @@ domain
 ```
 
 禁止反向依赖。
+
+> server 已随纯前端迁移移除；devtools 是唯一的 bin crate，
+> 提供模板预处理 / 扫描断言 / golden 生成三个子命令（不部署）。
 
 ---
 
@@ -351,30 +355,45 @@ Output
 
 ---
 
-## server
+## devtools
 
-HTTP 服务层。
+开发期工具层（唯一的 bin crate，不部署、不进包）。
 
 负责：
 
-* API
-* 请求处理
-* 参数校验
-* 调用 Pipeline
+* 模板预处理（目标条目 Stored 化，产出小程序内嵌模板）
+* 模板扫描断言（配置引用的属性/cvar 必须存在于模板且定长）
+* golden fixtures 生成（前端 JS 单测的对照基准）
 
-接口：
+用法：
 
 ```
-GET  /api/v1/schema
-
-POST /api/v1/build
-
-GET  /api/v1/download/{id}
+cargo run -p devtools -- preprocess <in.imazingapp> <out.imazingapp>
+cargo run -p devtools -- scan <config_dir> <template.imazingapp>
+cargo run -p devtools -- golden <config_dir> <template.imazingapp> <out_dir>
 ```
 
 禁止：
 
 * 写业务逻辑
+
+---
+
+## 小程序 engine（运行时执行层）
+
+`miniprogram/engine/` 是纯前端方案的运行链路，与 Rust 引擎一一对应：
+
+| Rust（oracle） | 小程序（运行时） | 说明 |
+|---|---|---|
+| config-compiler + patch-engine | translate.js | 选择 → 补丁操作 |
+| save-engine | sav.js | GVAS 定位 + 原地覆盖（模板受控，不移植完整解析器） |
+| ini-engine | ini.js | ini 行级处理 |
+| template-engine | zip.js + generate.js | zip 字节重写（零压缩代码）+ 编排 |
+
+规则：
+
+* 引擎逻辑变更必须先改 Rust 侧，重新生成 golden，Node 测试对照通过后再改 JS
+* 禁止在 JS 侧引入 Rust 没有的行为
 
 ---
 
@@ -391,9 +410,7 @@ config/
 
 ├── targets.json
 
-├── versions.json
-
-└── translations/
+└── versions.json
 ```
 
 ## schema.json
@@ -458,7 +475,14 @@ config/
 
 如果可以：
 
-不要修改 Rust。
+只改 config/，然后：
+
+```
+node scripts/build-config.js
+cargo run -p devtools -- scan config <template>
+cargo run -p devtools -- golden config <template> golden
+node miniprogram/engine/test/engine.test.js
+```
 
 ---
 
@@ -557,8 +581,8 @@ TODO.md
 例如：
 
 * 新配置能力
-* 新 API
-* 新模块
+* 新 engine 模块
+* 新 devtools 子命令
 
 ## 架构变化
 
@@ -674,9 +698,9 @@ unwrap()
 
 ---
 
-# API 修改规范
+# engine 接口修改规范
 
-修改 API：
+修改 `miniprogram/engine/` 的对外接口（generate / translate / sav / zip）：
 
 必须说明：
 
@@ -687,6 +711,9 @@ unwrap()
 禁止：
 
 无说明修改接口。
+
+所有引擎行为变更必须先改 Rust oracle 侧并重新生成 golden，
+Node 测试对照通过后才能合入。
 
 ---
 

@@ -1,11 +1,13 @@
 # 和平精英 .imazingapp 生成器 —— Cargo Workspace 根
 #
 # 分层依赖方向（单向，禁止反向）：
-#   server → pipeline → {patch-engine, save-engine, ini-engine, zip-engine, config-compiler}
-#          → config-model → domain
+#   devtools → pipeline → {patch-engine, save-engine, ini-engine, zip-engine, config-compiler}
+#            → config-model → domain
 #
 # domain 是叶子 crate，任何 crate 均可依赖它。
 # 业务语义一律来自 config/，各 crate 只提供执行能力。
+# 注意：server 已随纯前端迁移移除；Rust 侧现为开发期 oracle
+# （golden 基准 + 模板预处理），不部署、不进包。
 
 [workspace]
 resolver = "3"
@@ -19,7 +21,7 @@ members = [
     "crates/template-engine",
     "crates/patch-engine",
     "crates/pipeline",
-    "crates/server",
+    "crates/devtools",
 ]
 
 # 所有 crate 共享的包级元数据

@@ -1,7 +1,0 @@
-{
-  "field_id": "sprint_sensitivity",
-  "target_id": "active_sav",
-  "address": "JoystickSprintParam",
-  "value_type": "float",
-  "value_from_input": true
-}

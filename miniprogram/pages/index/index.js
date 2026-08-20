@@ -1,6 +1,16 @@
 // pages/index/index.js
 
-const configApi = require('../../api/config.js');
+const { generate } = require('../../engine/generate.js');
+const { getSchemaView } = require('../../engine/schema.js');
+const { base64ToBytes } = require('../../engine/util.js');
+const config = require('../../engine/config.js');
+const { CACHE_FILE_PATH, CACHE_NAME_KEY } = require('../../api/request.js');
+
+// 内嵌预处理模板的 base64（engine/template.js，随代码打包）。
+// 懒解码：onLoad 时解码并包 try/catch，避免模块加载期阻塞首屏、
+// 且解码失败时能走页面错误提示而非白屏。
+const TEMPLATE_B64 = require('../../engine/template.js');
+let TEMPLATE_BYTES = null;
 
 Page({
   data: {
@@ -9,7 +19,7 @@ Page({
     fields: [],
     selections: {},
     generating: false,
-    lastGenerateTime: 0  // 添加：上次生成时间
+    lastGenerateTime: 0
   },
 
   onLoad() {
@@ -17,34 +27,37 @@ Page({
   },
 
   /**
-   * 加载配置 schema
+   * 加载配置 schema（本地内嵌配置，纯前端无网络请求）
    */
-  async loadSchema() {
-    this.setData({ loading: true, error: null });
-
-    try {
-      const schema = await configApi.getSchema();
-
-      // 初始化 selections（使用默认值）
-      const selections = {};
-      schema.fields.forEach(field => {
-        if (field.default !== null && field.default !== undefined) {
-          selections[field.id] = this.parseDefaultValue(field);
-        }
-      });
-
-      this.setData({
-        fields: schema.fields,
-        selections: selections,
-        loading: false
-      });
-    } catch (err) {
-      console.error('加载 schema 失败:', err);
-      this.setData({
-        loading: false,
-        error: err.message || '加载配置失败'
-      });
+  loadSchema() {
+    // 懒解码内嵌模板（380KB base64 → 285KB 字节），失败走页面错误提示
+    if (!TEMPLATE_BYTES) {
+      try {
+        TEMPLATE_BYTES = base64ToBytes(TEMPLATE_B64);
+      } catch (e) {
+        console.error('模板解码失败:', e);
+      }
     }
+    if (!TEMPLATE_BYTES || TEMPLATE_BYTES.length === 0) {
+      this.setData({ loading: false, error: '模板数据缺失，请重新安装最新版本' });
+      return;
+    }
+
+    const schema = getSchemaView(config);
+
+    // 初始化 selections（使用默认值）
+    const selections = {};
+    schema.fields.forEach(field => {
+      if (field.default !== null && field.default !== undefined) {
+        selections[field.id] = this.parseDefaultValue(field);
+      }
+    });
+
+    this.setData({
+      fields: schema.fields,
+      selections: selections,
+      loading: false
+    });
   },
 
   /**
@@ -80,6 +93,11 @@ Page({
    * 生成配置文件
    */
   async onGenerate() {
+    if (!TEMPLATE_BYTES || TEMPLATE_BYTES.length === 0) {
+      wx.showToast({ title: '模板数据缺失，请重新安装最新版本', icon: 'none' });
+      return;
+    }
+
     const now = Date.now();
     const COOLDOWN_TIME = 5000; // 5秒冷却时间
 
@@ -114,25 +132,33 @@ Page({
     });
 
     try {
-      // 构造请求参数（使用自定义选择）
-      const params = {
-        selections: this.formatSelections(this.data.selections)
-      };
+      // 本地生成（纯前端，无网络请求）
+      const result = generate(config, this.data.selections, TEMPLATE_BYTES);
+      if (!result.bytes || result.bytes.length === 0) {
+        throw new Error('生成结果为空');
+      }
 
-      // 调用构建 API（后端直接返回文件字节，已写入本地缓存）
-      await configApi.build(params);
+      // 写入本地缓存（覆盖上一个，供下载页反复分享）。
+      // 注意：writeFileSync 只保证支持 string | ArrayBuffer，
+      // Uint8Array 在部分基础库版本会报 empty data，显式转 ArrayBuffer。
+      const fs = wx.getFileSystemManager();
+      const { byteOffset, byteLength } = result.bytes;
+      const arrayBuffer = result.bytes.buffer.slice(byteOffset, byteOffset + byteLength);
+      fs.writeFileSync(CACHE_FILE_PATH, arrayBuffer);
+      wx.setStorageSync(CACHE_NAME_KEY, result.filename);
 
       wx.hideLoading();
       this.setData({ generating: false });
 
-      // 跳转到下载页面（文件已缓存，无需传 id）
+      // 跳转到下载页面（文件已缓存）
       wx.navigateTo({
         url: `/pages/download/download`
       });
     } catch (err) {
       console.error('生成失败:', err);
       wx.hideLoading();
-      this.setData({ generating: false });
+      // 失败不占冷却：用户改配置后可立即重试
+      this.setData({ generating: false, lastGenerateTime: 0 });
 
       wx.showModal({
         title: '生成失败',
@@ -140,31 +166,5 @@ Page({
         showCancel: false
       });
     }
-  },
-
-  /**
-   * 格式化 selections（转换为 API 期望的格式）
-   */
-  formatSelections(selections) {
-    const formatted = {};
-
-    Object.keys(selections).forEach(fieldId => {
-      const value = selections[fieldId];
-      const field = this.data.fields.find(f => f.id === fieldId);
-
-      if (!field) return;
-
-      // 根据字段类型格式化值
-      if (field.type === 'slider') {
-        formatted[fieldId] = parseFloat(value);
-      } else if (field.type === 'switch') {
-        // Switch 类型：保持为字符串 ID（"on"/"off"），不转换为 Boolean
-        formatted[fieldId] = value;
-      } else {
-        formatted[fieldId] = value;
-      }
-    });
-
-    return formatted;
   }
 });

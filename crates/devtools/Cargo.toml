@@ -1,0 +1,21 @@
+[package]
+name = "devtools"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+# 开发期工具（不部署、不进包）：
+#   preprocess  —— 模板预处理：目标条目 Stored 化（纯前端方案前提）
+#   scan        —— 模板扫描断言：配置引用的属性/cvar 必须存在于模板
+#   golden      —— 生成各配置组合的 golden fixtures（JS 单测对照基准）
+[dependencies]
+domain.workspace = true
+config-compiler.workspace = true
+pipeline.workspace = true
+save-engine.workspace = true
+ini-engine.workspace = true
+template-engine.workspace = true
+serde_json.workspace = true
+zip = "2"

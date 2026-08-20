@@ -51,6 +51,7 @@ function post(path, data) {
 
 // 固定的本地缓存路径：只保留最新一个文件，每次生成覆盖。
 // 用纯 ASCII 名（中文/% 会导致 shareFileMessage 出错），中文显示名单独存。
+// 由页面层（index.js 写入 / download.js 经 getCachedFile 读取）共用，勿改。
 const CACHE_FILE_PATH = `${wx.env.USER_DATA_PATH}/latest_config.imazingapp`;
 const CACHE_NAME_KEY = 'latest_config_filename';
 
@@ -108,5 +109,7 @@ module.exports = {
   get,
   post,
   buildFile,
-  getCachedFile
+  getCachedFile,
+  CACHE_FILE_PATH,
+  CACHE_NAME_KEY
 };

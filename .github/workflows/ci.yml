@@ -1,9 +1,9 @@
 name: CI
 
 # 触发：推送到 main、或针对 main 的 PR。
-# 与微信云托管流水线的分工：
-#   - GitHub Actions（本文件）= CI 门禁：fmt / clippy / test + 校验 Docker 镜像可构建
-#   - 微信云托管流水线        = CD    ：push 触发后用 Dockerfile 构建镜像并部署到 80 端口
+# 纯前端方案后无服务端部署，本文件仅为代码质量门禁：
+#   - Rust oracle 侧：fmt / clippy / test
+#   - 前端引擎侧：模板预处理 + golden 生成 + Node 单测对照
 on:
   push:
     branches: [main]
@@ -26,7 +26,7 @@ env:
 jobs:
   # ── 代码质量 + 测试（对应 CLAUDE.md 提交前要求：fmt / check / test）──
   test:
-    name: 格式 / Clippy / 测试
+    name: 格式 / Clippy / 测试 / 前端引擎
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,26 +45,18 @@ jobs:
       - name: Clippy（警告视为错误）
         run: cargo clippy --workspace --all-targets -- -D warnings
 
-      - name: 运行测试
+      - name: 运行 Rust 测试
         run: cargo test --workspace
 
-  # ── 校验 Docker 镜像可构建（与微信云托管实际构建的产物一致）──
-  docker:
-    name: Docker 构建校验
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+      # ── 前端引擎：模板预处理 → 内嵌 → 扫描断言 → golden → Node 单测对照 ──
+      - name: 模板预处理 + base64 内嵌 + 扫描断言
+        run: |
+          mkdir -p .cache
+          cargo run -p devtools -- preprocess template.imazingapp .cache/template.imazingapp
+          node scripts/build-template.js .cache/template.imazingapp
+          cargo run -p devtools -- scan config .cache/template.imazingapp
 
-      - name: 设置 Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: 构建镜像（仅校验，不推送）
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile
-          push: false
-          tags: imazing-server:ci
-          # 复用 Actions 缓存加速 Docker 层构建
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: 生成 golden + Node 引擎测试（条目级对照）
+        run: |
+          cargo run -p devtools -- golden config .cache/template.imazingapp golden
+          node miniprogram/engine/test/engine.test.js
