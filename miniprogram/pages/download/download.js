@@ -172,6 +172,19 @@ Page({
     });
   },
 
+  /** 原生模板广告事件。 */
+  adLoad() {
+    console.log('下载页原生模板广告加载成功');
+  },
+
+  adError(err) {
+    console.error('下载页原生模板广告加载失败', err);
+  },
+
+  adClose() {
+    console.log('下载页原生模板广告关闭');
+  },
+
   onUnload() {
     if (this.videoAd && this.videoAd.destroy) {
       this.videoAd.destroy();

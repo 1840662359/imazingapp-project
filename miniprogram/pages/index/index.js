@@ -23,7 +23,75 @@ Page({
   },
 
   onLoad() {
+    this.isPageVisible = true;
+    this.shouldShowInterstitialOnOpen = true;
+    this.createInterstitialAd();
     this.loadSchema();
+  },
+
+  onShow() {
+    this.isPageVisible = true;
+  },
+
+  onHide() {
+    this.isPageVisible = false;
+  },
+
+  onUnload() {
+    this.isPageVisible = false;
+    if (this.interstitialAd && this.interstitialAd.destroy) {
+      this.interstitialAd.destroy();
+    }
+    this.interstitialAd = null;
+  },
+
+  /** 创建首页插屏广告；广告加载完成后仅在首次进入首页时展示一次。 */
+  createInterstitialAd() {
+    if (!wx.createInterstitialAd) {
+      console.warn('当前微信基础库不支持插屏广告');
+      return;
+    }
+
+    this.interstitialAd = wx.createInterstitialAd({
+      adUnitId: 'adunit-b2de79272942d123'
+    });
+
+    this.interstitialAd.onLoad(() => {
+      this.showInterstitialAdOnOpen();
+    });
+
+    this.interstitialAd.onError((err) => {
+      console.error('首页插屏广告加载失败', err);
+    });
+
+    this.interstitialAd.onClose(() => {
+      console.log('首页插屏广告已关闭');
+    });
+  },
+
+  /** 首页首次打开且仍在前台时展示，避免异步加载完成后覆盖其他页面。 */
+  showInterstitialAdOnOpen() {
+    if (!this.shouldShowInterstitialOnOpen || !this.isPageVisible || !this.interstitialAd) {
+      return;
+    }
+
+    this.shouldShowInterstitialOnOpen = false;
+    this.interstitialAd.show().catch((err) => {
+      console.error('首页插屏广告显示失败', err);
+    });
+  },
+
+  /** 原生模板广告事件。 */
+  adLoad() {
+    console.log('原生模板广告加载成功');
+  },
+
+  adError(err) {
+    console.error('原生模板广告加载失败', err);
+  },
+
+  adClose() {
+    console.log('原生模板广告关闭');
   },
 
   /**
@@ -88,6 +156,12 @@ Page({
       [`selections.${fieldId}`]: value
     });
   },
+
+  /** 固定底栏消费空白区域点击，避免事件落到下方的滚动列表。 */
+  onBottomBarTap() {},
+
+  /** 固定底栏消费滑动手势，避免列表在栏下方继续滚动。 */
+  onBottomBarTouchMove() {},
 
   /**
    * 生成配置文件

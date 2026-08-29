@@ -1,5 +1,16 @@
 <!-- pages/index/index.wxml -->
 <view class="container">
+  <!-- 原生模板广告置于普通文档流顶部，避免与固定底部操作栏发生层叠。 -->
+  <view class="native-ad-section">
+    <ad-custom
+      class="native-template-ad"
+      unit-id="adunit-79a5e9ab4bf8af52"
+      bindload="adLoad"
+      binderror="adError"
+      bindclose="adClose"
+    ></ad-custom>
+  </view>
+
   <!-- 加载中 -->
   <view wx:if="{{loading}}" class="loading">
     <view class="loading-text">加载配置中...</view>
@@ -29,7 +40,8 @@
     </view>
 
     <!-- 生成按钮 -->
-    <view class="actions">
+    <!-- 固定底栏是独立的实心交互层：拦截栏内空白区域触摸，防止手势落到底层列表。 -->
+    <view class="actions" catchtap="onBottomBarTap" catchtouchmove="onBottomBarTouchMove">
       <button
         class="generate-btn"
         type="primary"

@@ -18,6 +18,17 @@
     <button class="back-btn" bindtap="onBack">
       返回重新配置
     </button>
+
+    <!-- 位于返回按钮下方的原生模板广告，使用正常文档流避免覆盖操作按钮。 -->
+    <view class="native-ad-section">
+      <ad-custom
+        class="native-template-ad"
+        unit-id="adunit-79a5e9ab4bf8af52"
+        bindload="adLoad"
+        binderror="adError"
+        bindclose="adClose"
+      ></ad-custom>
+    </view>
   </view>
 
   <!-- 出错状态 -->
@@ -29,5 +40,16 @@
     <button class="back-btn" type="primary" bindtap="onBack">
       返回重新配置
     </button>
+
+    <!-- 出错状态同样保留在按钮下方，两个状态互斥，不会同时创建。 -->
+    <view class="native-ad-section">
+      <ad-custom
+        class="native-template-ad"
+        unit-id="adunit-79a5e9ab4bf8af52"
+        bindload="adLoad"
+        binderror="adError"
+        bindclose="adClose"
+      ></ad-custom>
+    </view>
   </view>
 </view>

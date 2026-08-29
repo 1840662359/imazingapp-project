@@ -6,6 +6,19 @@
   padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
 }
 
+/* 原生模板广告保持在页面顶部的正常文档流中，绝不固定到操作栏区域。 */
+.native-ad-section {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+.native-template-ad {
+  display: block;
+  width: 100%;
+}
+
 /* 加载中 */
 .loading {
   display: flex;
@@ -75,12 +88,17 @@
 /* 操作按钮 */
 .actions {
   position: fixed;
+  z-index: 1000;
   bottom: 0;
   left: 0;
   right: 0;
+  box-sizing: border-box;
+  min-height: 130rpx;
   padding: 20rpx 30rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-  background: #fff;
+  overflow: hidden;
+  opacity: 1;
+  background-color: #fff;
   box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1);
 }
 
