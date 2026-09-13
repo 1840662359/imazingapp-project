@@ -313,6 +313,38 @@ mod tests {
     }
 
     #[test]
+    fn test_set_inserts_missing_key_without_losing_existing_entries() {
+        let ini = b"[UserCustom DeviceProfile]\n+CVars=r.UserQualitySetting=1\n";
+        let mut doc = IniDoc::load(ini).unwrap();
+
+        doc.set("UserCustom DeviceProfile", "r.PUBGDeviceFPSDef", "8")
+            .unwrap();
+
+        assert_eq!(
+            doc.get("UserCustom DeviceProfile", "r.UserQualitySetting"),
+            Some("1")
+        );
+        assert_eq!(
+            doc.get("UserCustom DeviceProfile", "r.PUBGDeviceFPSDef"),
+            Some("8")
+        );
+    }
+
+    #[test]
+    fn test_set_creates_missing_section_and_serializes_it() {
+        let mut doc = IniDoc::load(b"[Other]\n+CVars=keep=value\n").unwrap();
+
+        doc.set("UserCustom DeviceProfile", "r.PUBGDeviceFPSDef", "8")
+            .unwrap();
+        let content = String::from_utf8(doc.save().unwrap()).unwrap();
+
+        assert!(content.contains("[Other]\n+CVars=keep=value"));
+        assert!(content.contains(
+            "[UserCustom DeviceProfile]\n+CVars=r.PUBGDeviceFPSDef=8"
+        ));
+    }
+
+    #[test]
     fn test_remove() {
         let ini = b"[UserCustom DeviceProfile]\n\
                     +CVars=r.MobileContentScaleFactor=2.0\n\

@@ -27,7 +27,10 @@
   <view wx:else class="form-container">
     <!-- 动态字段 -->
     <view class="fields-section">
-      <view class="section-title">自定义配置</view>
+      <view class="section-heading">
+        <view class="section-title">自定义配置</view>
+        <view class="version-label">当前程序适配版本：金秋龙狮城（9月2日）</view>
+      </view>
       <view class="fields-list">
         <dynamic-field
           wx:for="{{fields}}"

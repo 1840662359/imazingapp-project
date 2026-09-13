@@ -156,6 +156,59 @@ test('ini：render_optimization off 删除 5 条 CVar（remove_when）', () => {
   }
 });
 
+test('ini：缺失 CVar 自动插入且保留已有配置', () => {
+  const ini = IniDoc.load(Buffer.from(
+    '[UserCustom DeviceProfile]\n+CVars=r.UserQualitySetting=1\n',
+    'utf8'
+  ));
+
+  ini.set('UserCustom DeviceProfile', 'r.PUBGDeviceFPSDef', '8');
+
+  assert.strictEqual(ini.get('UserCustom DeviceProfile', 'r.UserQualitySetting'), '1');
+  assert.strictEqual(ini.get('UserCustom DeviceProfile', 'r.PUBGDeviceFPSDef'), '8');
+});
+
+test('ini：目标 section 缺失时自动创建', () => {
+  const ini = IniDoc.load(Buffer.from('[Other]\n+CVars=keep=value\n', 'utf8'));
+
+  ini.set('UserCustom DeviceProfile', 'r.PUBGDeviceFPSDef', '8');
+  const saved = Buffer.from(ini.save()).toString('utf8');
+
+  assert(saved.includes('[Other]\n+CVars=keep=value'));
+  assert(saved.includes('[UserCustom DeviceProfile]\n+CVars=r.PUBGDeviceFPSDef=8'));
+});
+
+test('ini：当前模板缺失项生成时补齐，并保留模板参数与备份 section', () => {
+  const result = generate(config, {
+    fps: 'fps_120',
+    render_optimization: 'on',
+  }, TEMPLATE);
+  const { entries } = readZipEntries(result.bytes);
+  const iniEntry = entries.find((e) => e.name.endsWith('UserCustom.ini'));
+  const { bytes: iniBytes } = extractEntry(result.bytes, iniEntry.name);
+  const ini = IniDoc.load(iniBytes);
+  const section = 'UserCustom DeviceProfile';
+
+  for (const cvar of [
+    'r.PUBGDeviceFPSDef', 'r.PUBGDeviceFPSLow', 'r.PUBGDeviceFPSMid',
+    'r.PUBGDeviceFPSHigh', 'r.PUBGDeviceFPSHDR', 'r.PUBGDeviceFPSUltralHigh',
+    'r.PUBGDeviceFPSUltimateHigh',
+  ]) {
+    assert.strictEqual(ini.get(section, cvar), '8', `应插入 ${cvar}=8`);
+  }
+  assert.strictEqual(ini.get(section, 'r.BloomQuality'), '0');
+  assert.strictEqual(ini.get(section, 'r.LightShaftQuality'), '0');
+  assert.strictEqual(ini.get(section, 'r.Mobile.TonemapperFilm'), '0');
+  assert.strictEqual(ini.get(section, 'r.Mobile.AlwaysResolveDepth'), '0');
+  assert.strictEqual(ini.get(section, 'r.MobileSimpleShader'), '1');
+  assert.notStrictEqual(
+    ini.get(section, 'r.UserQualitySetting'),
+    undefined,
+    '应保留模板原有配置项'
+  );
+  assert(ini.sections.has('BackUp DeviceProfile'), '应保留 BackUp DeviceProfile');
+});
+
 // ============================================================================
 // 4. 文件名（对齐 Rust routes::generate_filename 测试用例）
 // ============================================================================

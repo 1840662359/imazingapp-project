@@ -64,8 +64,8 @@ node scripts/build-template.js <预处理后的模板>
     二进制文件在打包/真机传输不可靠，JS 内嵌保证必然随包
 
 cargo run -p devtools -- scan <config_dir> <template.imazingapp>
-    扫描断言：配置引用的 sav 属性 / ini cvar 必须存在于模板且定长
-    （模板升级时第一时间暴露不兼容）
+    扫描断言：配置引用的 sav 属性必须存在且定长；缺失的 ini cvar
+    会被报告，并在生成时自动插入（模板升级时第一时间暴露差异）
 
 cargo run -p devtools -- golden <config_dir> <template.imazingapp> <out_dir>
     生成各配置组合的 golden fixtures（case-NN.imazingapp + case-NN.json），

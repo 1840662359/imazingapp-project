@@ -66,12 +66,28 @@
   padding: 30rpx;
 }
 
-/* 区块标题 */
+/* 区块标题与当前适配版本 */
+.section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-bottom: 20rpx;
+}
+
 .section-title {
+  flex-shrink: 0;
   font-size: 36rpx;
   font-weight: 600;
   color: #333;
-  margin-bottom: 20rpx;
+}
+
+.version-label {
+  min-width: 0;
+  font-size: 24rpx;
+  line-height: 1.5;
+  color: #888;
+  text-align: right;
 }
 
 /* 字段区域 */

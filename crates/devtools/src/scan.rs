@@ -2,10 +2,10 @@
 //!
 //! 从 config/ 动态收集所有绑定目标（零硬编码）：
 //! - sav 目标：所有引用的属性必须存在于 Active.sav，且类型为定长（Int/Float = 4B）
-//! - ini 目标：所有引用的 cvar 必须存在于 UserCustom.ini 的 section 内
+//! - ini 目标：报告所有引用的 cvar；缺失项允许由生成引擎自动插入
 //!
 //! 模板升级（新游戏版本）时第一时间暴露属性缺失 / 改名 / 变长。
-//! 断言失败返回错误，CI 可据此失败。
+//! SAV 属性缺失仍会失败；INI cvar 缺失仅报告，不阻断生成。
 
 use std::collections::BTreeSet;
 use std::io::Cursor;
@@ -114,22 +114,18 @@ pub fn run(config_dir: &str, template_path: &str) -> Result<String> {
             ));
         } else {
             missing.push(cvar.clone());
+            report.push_str(&format!("+ {cvar}: 模板中缺失，生成时自动插入\n"));
         }
-    }
-    if !missing.is_empty() {
-        return Err(Error::Config(format!(
-            "UserCustom.ini section [{}] 缺少 cvar: {} —— 模板版本可能不兼容",
-            section,
-            missing.join(", ")
-        )));
     }
 
     // ---- 汇总 ----
     report.push_str(&format!(
-        "\n汇总: {} 个 sav 属性（{} 定长）、{} 个 ini cvar 全部命中",
+        "\n汇总: {} 个 sav 属性（{} 定长）、{} 个 ini cvar（{} 已存在，{} 将自动插入）",
         saved_types.len(),
         saved_types.len(),
-        ini_cvars.len()
+        ini_cvars.len(),
+        ini_cvars.len() - missing.len(),
+        missing.len()
     ));
     Ok(report)
 }
