@@ -1,8 +1,7 @@
 # 微信小程序（纯前端单机版）
 
 > 本版本无服务端：配置与模板内嵌于包内，生成在设备本地完成。
-> `api/` 中的 schema、预设和远端构建请求已不用于当前流程；
-> 页面仍复用其中的本地文件缓存常量与缓存读取函数。
+> 生成、配置读取和文件缓存均在本地完成，不包含云托管请求。
 
 ## 前置要求
 
@@ -35,9 +34,8 @@ miniprogram/
 │   ├── generate.js              # 编排入口
 │   └── test/engine.test.js      # Node 单测（对照 golden，见仓库根 README）
 │
-├── api/                         # 旧云托管请求封装 + 当前使用的本地缓存辅助函数
-│   ├── request.js
-│   └── config.js
+├── utils/
+│   └── file-cache.js            # 本地生成文件缓存路径与读取方法
 │
 ├── components/
 │   └── dynamic-field/           # schema 动态字段组件

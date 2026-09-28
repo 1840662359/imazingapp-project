@@ -148,7 +148,6 @@ pipeline
 patch-engine
 save-engine
 ini-engine
-zip-engine
 template-engine
 config-compiler
 
@@ -286,18 +285,6 @@ PatchOp[]
 禁止：
 
 * 写死游戏配置
-
----
-
-## zip-engine
-
-负责：
-
-基础 zip 操作。
-
-禁止：
-
-* 业务逻辑
 
 ---
 

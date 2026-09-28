@@ -1,6 +1,6 @@
 // pages/download/download.js
 
-const configApi = require('../../api/config.js');
+const { getCachedFile } = require('../../utils/file-cache.js');
 
 const AD_UNLOCK_EXPIRES_AT_KEY = 'share_ad_unlock_expires_at';
 const AD_UNLOCK_DURATION = 24 * 60 * 60 * 1000;
@@ -15,7 +15,7 @@ Page({
 
   onLoad() {
     // 文件已在生成时写入本地缓存，这里直接读取（可反复分享）
-    const cached = configApi.getCachedFile();
+    const cached = getCachedFile();
     if (cached) {
       this._filePath = cached.filePath;
       this.setData({

@@ -4,7 +4,7 @@ const { generate } = require('../../engine/generate.js');
 const { getSchemaView } = require('../../engine/schema.js');
 const { base64ToBytes } = require('../../engine/util.js');
 const config = require('../../engine/config.js');
-const { CACHE_FILE_PATH, CACHE_NAME_KEY } = require('../../api/request.js');
+const { CACHE_FILE_PATH, CACHE_NAME_KEY } = require('../../utils/file-cache.js');
 
 // 内嵌预处理模板的 base64（engine/template.js，随代码打包）。
 // 懒解码：onLoad 时解码并包 try/catch，避免模块加载期阻塞首屏、

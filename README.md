@@ -39,7 +39,7 @@
 
 ### Rust Workspace（开发期 oracle，不部署、不进包）
 
-    devtools → pipeline → {patch-engine, save-engine, ini-engine, zip-engine, config-compiler}
+    devtools → pipeline → {patch-engine, save-engine, ini-engine, config-compiler}
                         → config-model → domain
 
 -   domain：基础类型与错误定义
@@ -48,7 +48,6 @@
 -   patch-engine：用户选择转换为 PatchOp
 -   save-engine：UE .sav 文件修改（uesave）
 -   ini-engine：ini 配置修改
--   zip-engine：zip 基础处理（骨架，pipeline 直接用 zip crate）
 -   template-engine：imazingapp 模板流式生成
 -   pipeline：生成流程编排
 -   devtools：开发期工具（模板预处理 / 扫描断言 / golden 生成）
@@ -72,7 +71,7 @@ cargo run -p devtools -- golden <config_dir> <template.imazingapp> <out_dir>
     Node 单测以条目级（name/method/size/crc32）对照 Rust pipeline 产物
 ```
 
-完整构建流程（CI 与本地一致）：
+完整本地校验流程：
 
 ```text
 cargo run -p devtools -- preprocess template.imazingapp .cache/template.imazingapp
@@ -118,7 +117,6 @@ node miniprogram/engine/test/engine.test.js
 
 -   Rust oracle 侧：`cargo test`（配置 / 引擎 / pipeline 测试）
 -   前端引擎侧：见上方完整构建流程（golden + Node 对照）
--   GitHub Actions 门禁：fmt / clippy / test + 预处理 / 内嵌 / 扫描 / golden / Node 对照
 -   真机验收：iMazing 导入 + 游戏内验证（发布前人工确认）
 
 ## 小程序

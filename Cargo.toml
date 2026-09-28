@@ -1,7 +1,7 @@
 # 和平精英 .imazingapp 生成器 —— Cargo Workspace 根
 #
 # 分层依赖方向（单向，禁止反向）：
-#   devtools → pipeline → {patch-engine, save-engine, ini-engine, zip-engine, config-compiler}
+#   devtools → pipeline → {patch-engine, save-engine, ini-engine, config-compiler}
 #            → config-model → domain
 #
 # domain 是叶子 crate，任何 crate 均可依赖它。
@@ -17,7 +17,6 @@ members = [
     "crates/config-compiler",
     "crates/save-engine",
     "crates/ini-engine",
-    "crates/zip-engine",
     "crates/template-engine",
     "crates/patch-engine",
     "crates/pipeline",
@@ -40,7 +39,6 @@ config-model = { path = "crates/config-model" }
 config-compiler = { path = "crates/config-compiler" }
 save-engine = { path = "crates/save-engine" }
 ini-engine = { path = "crates/ini-engine" }
-zip-engine = { path = "crates/zip-engine" }
 template-engine = { path = "crates/template-engine" }
 patch-engine = { path = "crates/patch-engine" }
 pipeline = { path = "crates/pipeline" }
@@ -50,10 +48,6 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "1"
 tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-tokio = { version = "1", features = ["full"] }
-axum = "0.7"
-async-trait = "0.1"
 
 [profile.release]
 lto = true
