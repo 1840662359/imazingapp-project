@@ -24,7 +24,7 @@ module.exports = {
             "label": "高清"
           }
         ],
-        "default": "hd"
+        "default": "smooth"
       },
       {
         "id": "fps",
@@ -118,7 +118,7 @@ module.exports = {
             "label": "关闭"
           }
         ],
-        "default": "on"
+        "default": "off"
       },
       {
         "id": "render_optimization",

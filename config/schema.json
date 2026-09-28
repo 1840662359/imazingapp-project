@@ -10,7 +10,7 @@
         {"id": "balanced", "label": "均衡"},
         {"id": "hd", "label": "高清"}
       ],
-      "default": "hd"
+      "default": "smooth"
     },
     {
       "id": "fps",
@@ -68,7 +68,7 @@
         {"id": "on", "label": "开启"},
         {"id": "off", "label": "关闭"}
       ],
-      "default": "on"
+      "default": "off"
     },
     {
       "id": "render_optimization",
