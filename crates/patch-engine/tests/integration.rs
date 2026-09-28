@@ -37,14 +37,17 @@ fn test_translate_simple_selection() {
         .expect("翻译失败");
 
     // fps 有 11 个绑定（2 个固定值 ini + 7 个帧率 ini + 2 个 sav）
-    let fps_ops: Vec<_> = ops.iter().filter(|op| {
-        matches!(&op.action, PatchAction::Set { address, value }
-            if address.starts_with("r.PUBGDeviceFPS")
-                || address == "r.PUBGMaxSupportQualityLevel"
-                || address == "r.PUBGLDR"
-                || address == "FPSLevel"
-                || address == "FpsLevel_TA")
-    }).collect();
+    let fps_ops: Vec<_> = ops
+        .iter()
+        .filter(|op| {
+            matches!(&op.action, PatchAction::Set { address, value }
+                if address.starts_with("r.PUBGDeviceFPS")
+                    || address == "r.PUBGMaxSupportQualityLevel"
+                    || address == "r.PUBGLDR"
+                    || address == "FPSLevel"
+                    || address == "FpsLevel_TA")
+        })
+        .collect();
     assert_eq!(fps_ops.len(), 11, "fps 应生成 11 个操作");
 
     let quality_level_op = ops.iter().find(|op| {

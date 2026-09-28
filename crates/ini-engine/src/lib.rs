@@ -339,9 +339,7 @@ mod tests {
         let content = String::from_utf8(doc.save().unwrap()).unwrap();
 
         assert!(content.contains("[Other]\n+CVars=keep=value"));
-        assert!(content.contains(
-            "[UserCustom DeviceProfile]\n+CVars=r.PUBGDeviceFPSDef=8"
-        ));
+        assert!(content.contains("[UserCustom DeviceProfile]\n+CVars=r.PUBGDeviceFPSDef=8"));
     }
 
     #[test]
