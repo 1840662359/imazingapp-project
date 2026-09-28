@@ -1,4 +1,5 @@
-// api/request.js - 网络请求封装（微信云托管 callContainer）
+// 历史网络请求封装（微信云托管 callContainer）；当前页面不调用网络请求方法。
+// 首页和下载页仍复用本文件导出的本地缓存路径、名称键及缓存读取方法。
 
 const app = getApp();
 

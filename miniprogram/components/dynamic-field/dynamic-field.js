@@ -99,7 +99,8 @@ Component({
         if (Number.isInteger(numValue)) {
           return numValue + 'K';
         }
-        return numValue.toFixed(1) + 'K';
+        // 分辨率支持 0.01 步长；最多显示两位，并移除无意义的末尾 0。
+        return numValue.toFixed(2).replace(/0+$/, '').replace(/\.$/, '') + 'K';
       }
 
       // 默认显示

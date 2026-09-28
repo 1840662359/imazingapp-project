@@ -189,6 +189,8 @@ test('ini：当前模板缺失项生成时补齐，并保留模板参数与备�
   const ini = IniDoc.load(iniBytes);
   const section = 'UserCustom DeviceProfile';
 
+  assert.strictEqual(ini.get(section, 'r.PUBGMaxSupportQualityLevel'), '4');
+  assert.strictEqual(ini.get(section, 'r.PUBGLDR'), '1');
   for (const cvar of [
     'r.PUBGDeviceFPSDef', 'r.PUBGDeviceFPSLow', 'r.PUBGDeviceFPSMid',
     'r.PUBGDeviceFPSHigh', 'r.PUBGDeviceFPSHDR', 'r.PUBGDeviceFPSUltralHigh',
@@ -229,6 +231,11 @@ test('filename 1.7K 无浮点噪声', () => {
   assert(!name.includes('1.70000'), `不应出现浮点噪声: ${name}`);
 });
 
+test('filename 分辨率支持两位小数', () => {
+  assert(generateFilename({ resolution_scale: 1.75 }).startsWith('1.75K'));
+  assert(generateFilename({ resolution_scale: 1.70 }).startsWith('1.7K'));
+});
+
 test('filename 整数分辨率去 .0', () => {
   assert(generateFilename({ resolution_scale: 2.0 }).startsWith('2K'));
 });
@@ -239,7 +246,7 @@ test('filename 超广角开关', () => {
 });
 
 // ============================================================================
-// 4.5 schema 视图（对齐原服务端 real_service 转换）
+// 4.5 schema 视图转换
 // ============================================================================
 test('schema：10 个字段，display 换算正确', () => {
   const { fields } = getSchemaView(config);
@@ -257,6 +264,7 @@ test('schema：10 个字段，display 换算正确', () => {
 
   // 无 display_multiplier 的字段不输出 display_min/max
   const resolution = fields.find((f) => f.id === 'resolution_scale');
+  assert.strictEqual(resolution.step, 0.01);
   assert.strictEqual(resolution.display_min, undefined);
   assert.strictEqual(resolution.display_max, undefined);
 
@@ -268,15 +276,21 @@ test('schema：10 个字段，display 换算正确', () => {
 // ============================================================================
 // 5. translate 单测（对齐 Rust patch-engine 行为）
 // ============================================================================
-test('translate：fps_120 生成 7 条 ini + 2 条 sav 绑定', () => {
+test('translate：fps_120 生成 9 条 ini + 2 条 sav 绑定', () => {
   const ops = translate(config, { fps: 'fps_120' });
   const iniOps = ops.filter((o) => o.target_id === 'user_ini');
   const savOps = ops.filter((o) => o.target_id === 'active_sav');
-  assert.strictEqual(iniOps.length, 7);
+  assert.strictEqual(iniOps.length, 9);
   assert.strictEqual(savOps.length, 2);
-  assert.strictEqual(iniOps[0].action.address, 'r.PUBGDeviceFPSDef');
+  assert.strictEqual(iniOps[0].action.address, 'r.PUBGMaxSupportQualityLevel');
   assert.strictEqual(iniOps[0].action.value.t, 'int');
-  assert.strictEqual(iniOps[0].action.value.v, 8);
+  assert.strictEqual(iniOps[0].action.value.v, 4);
+  assert.strictEqual(iniOps[1].action.address, 'r.PUBGLDR');
+  assert.strictEqual(iniOps[1].action.value.v, 1);
+  assert.strictEqual(
+    iniOps.find((op) => op.action.address === 'r.PUBGDeviceFPSDef').action.value.v,
+    8
+  );
   assert.strictEqual(savOps[0].action.address, 'FPSLevel');
   assert.strictEqual(savOps[0].action.value.v, 8);
 });

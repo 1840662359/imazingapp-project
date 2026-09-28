@@ -54,7 +54,7 @@ module.exports = {
         "label": "分辨率",
         "min": 1,
         "max": 2,
-        "step": 0.1,
+        "step": 0.01,
         "default": 2
       },
       {
@@ -183,6 +183,26 @@ module.exports = {
   "patches": {
     "bindings": {
       "fps": [
+        {
+          "target": "user_ini",
+          "cvar": "r.PUBGMaxSupportQualityLevel",
+          "value_type": "int",
+          "value_map": {
+            "extreme": 4,
+            "fps_90": 4,
+            "fps_120": 4
+          }
+        },
+        {
+          "target": "user_ini",
+          "cvar": "r.PUBGLDR",
+          "value_type": "int",
+          "value_map": {
+            "extreme": 1,
+            "fps_90": 1,
+            "fps_120": 1
+          }
+        },
         {
           "target": "user_ini",
           "cvar": "r.PUBGDeviceFPSDef",

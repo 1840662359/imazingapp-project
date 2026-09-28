@@ -82,7 +82,7 @@ ArrayBuffer → 写缓存路径 → 分享（现有链路不动）
 ### 5.4 translate.js + filename.js
 
 - translate：`(config, selections) → ops[]`，Set/Remove 两态，含 `value_from_input` 与 `value_map` 查表。
-- filename：移植 `generate_filename`（1.7K 浮点精度用 `toFixed(1)`）。
+- filename：移植 `generate_filename`；分辨率最多保留两位小数并去除末尾零。
 
 ### 5.5 配置内嵌与自检
 

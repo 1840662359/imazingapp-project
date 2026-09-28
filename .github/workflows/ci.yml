@@ -1,14 +1,14 @@
 name: CI
 
-# 触发：推送到 main、或针对 main 的 PR。
+# 触发：推送到 feature/pure-frontend、或针对该分支的 PR。
 # 纯前端方案后无服务端部署，本文件仅为代码质量门禁：
 #   - Rust oracle 侧：fmt / clippy / test
 #   - 前端引擎侧：模板预处理 + golden 生成 + Node 单测对照
 on:
   push:
-    branches: [main]
+    branches: [feature/pure-frontend]
   pull_request:
-    branches: [main]
+    branches: [feature/pure-frontend]
 
 # 同一分支只保留最新一次运行，节省 Actions 额度
 concurrency:

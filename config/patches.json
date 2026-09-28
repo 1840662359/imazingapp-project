@@ -3,6 +3,18 @@
     "fps": [
       {
         "target": "user_ini",
+        "cvar": "r.PUBGMaxSupportQualityLevel",
+        "value_type": "int",
+        "value_map": {"extreme": 4, "fps_90": 4, "fps_120": 4}
+      },
+      {
+        "target": "user_ini",
+        "cvar": "r.PUBGLDR",
+        "value_type": "int",
+        "value_map": {"extreme": 1, "fps_90": 1, "fps_120": 1}
+      },
+      {
+        "target": "user_ini",
         "cvar": "r.PUBGDeviceFPSDef",
         "value_type": "int",
         "value_map": {"extreme": 60, "fps_90": 7, "fps_120": 8}

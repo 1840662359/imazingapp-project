@@ -36,12 +36,28 @@ fn test_translate_simple_selection() {
         .translate(&config, &selections)
         .expect("翻译失败");
 
-    // fps 有 9 个绑定（7 个 ini + 2 个 sav）
+    // fps 有 11 个绑定（2 个固定值 ini + 7 个帧率 ini + 2 个 sav）
     let fps_ops: Vec<_> = ops.iter().filter(|op| {
         matches!(&op.action, PatchAction::Set { address, value }
-            if address.starts_with("r.PUBGDeviceFPS") || address == "FPSLevel" || address == "FpsLevel_TA")
+            if address.starts_with("r.PUBGDeviceFPS")
+                || address == "r.PUBGMaxSupportQualityLevel"
+                || address == "r.PUBGLDR"
+                || address == "FPSLevel"
+                || address == "FpsLevel_TA")
     }).collect();
-    assert_eq!(fps_ops.len(), 9, "fps 应生成 9 个操作");
+    assert_eq!(fps_ops.len(), 11, "fps 应生成 11 个操作");
+
+    let quality_level_op = ops.iter().find(|op| {
+        matches!(&op.action, PatchAction::Set { address, value }
+            if address == "r.PUBGMaxSupportQualityLevel" && value == &TypedValue::Int(4))
+    });
+    assert!(quality_level_op.is_some(), "应固定写入质量等级 4");
+
+    let ldr_op = ops.iter().find(|op| {
+        matches!(&op.action, PatchAction::Set { address, value }
+            if address == "r.PUBGLDR" && value == &TypedValue::Int(1))
+    });
+    assert!(ldr_op.is_some(), "应固定写入 LDR 1");
 
     // 检查一个具体的操作
     let fps_def_op = ops.iter().find(|op| {
@@ -228,8 +244,8 @@ fn test_no_business_logic_in_engine() {
         .translate(&config, &selections)
         .expect("翻译失败");
 
-    // 引擎只知道："fps" 这个 field_id 在配置里有 9 个绑定，生成 9 个操作
-    // 至于 "fps" 是什么意思、为什么是 7，引擎完全不关心
+    // 引擎只知道："fps" 这个 field_id 在配置里有 11 个绑定，生成 11 个操作。
+    // 帧率选项映射到什么值由配置决定；引擎不解释 FPS 的业务含义。
     for op in &ops {
         // 90帧对应的值是 7，但引擎不知道这个映射，只从配置读
         if let PatchAction::Set {

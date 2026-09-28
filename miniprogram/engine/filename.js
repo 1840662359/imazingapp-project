@@ -12,14 +12,15 @@
 function generateFilename(selections) {
   let name = '';
 
-  // 1. 分辨率（resolution_scale: 1.0-2.0，显示 1.0-2.0K）
+  // 1. 分辨率（resolution_scale: 1.00-2.00，最多显示两位小数）
   const resolution = selections.resolution_scale;
   if (typeof resolution === 'number') {
-    // 对齐 Rust {:.1}：整数去掉 .0；f64 精度噪声（1.7000000000000002）用 toFixed(1) 收敛
+    // 以两位小数收敛浮点噪声，再移除无意义的末尾 0。
     if (Number.isInteger(resolution)) {
       name += `${resolution}K`;
     } else {
-      name += `${resolution.toFixed(1)}K`;
+      const formatted = resolution.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+      name += `${formatted}K`;
     }
   }
 

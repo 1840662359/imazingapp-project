@@ -1,6 +1,6 @@
 // miniprogram/engine/schema.js —— 内嵌配置 → 前端 schema 视图。
 //
-// 对齐原服务端 real_service.rs 的转换逻辑：
+// 将内嵌配置转换为页面使用的 schema 结构：
 // - options：仅非空时输出
 // - default：字符串化（字符串原样、数字 toString）
 // - display_min/max：min/max × display_multiplier（三者齐全时）

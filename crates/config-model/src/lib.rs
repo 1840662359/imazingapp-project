@@ -110,7 +110,7 @@ pub struct OptionDef {
     pub label: String,
 }
 
-/// 字段依赖声明（用于前端联动与后端校验）。
+/// 字段依赖声明（用于前端联动与配置校验）。
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Dependency {
     /// 依赖的字段 id。

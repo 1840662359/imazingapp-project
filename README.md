@@ -33,7 +33,7 @@
     │   ├── sav.js            GVAS 定位 + 原地覆盖（不移植完整解析器）
     │   ├── zip.js            zip 字节级重写（零压缩代码）
     │   ├── filename.js       文件名生成
-    │   ├── schema.js         内嵌配置 → 前端 schema 视图（对齐原服务端转换）
+    │   ├── schema.js         内嵌配置 → 前端 schema 视图
     │   └── generate.js       编排入口
     └── test/engine.test.js   Node 单测（对照 golden）
 
