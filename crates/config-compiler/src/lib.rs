@@ -134,13 +134,13 @@ pub fn compile(raw: RawConfig) -> Result<Arc<CompiledConfig>> {
                 }
 
                 // 检查 remove_when 的选项存在
-                if let Some(ref remove_opt) = binding.remove_when {
-                    if !opts.contains(remove_opt) {
-                        return Err(Error::Config(format!(
-                            "binding for field '{}' has remove_when referencing unknown option: {}",
-                            field_id, remove_opt
-                        )));
-                    }
+                if let Some(ref remove_opt) = binding.remove_when
+                    && !opts.contains(remove_opt)
+                {
+                    return Err(Error::Config(format!(
+                        "binding for field '{}' has remove_when referencing unknown option: {}",
+                        field_id, remove_opt
+                    )));
                 }
             }
         }
@@ -157,13 +157,14 @@ pub fn compile(raw: RawConfig) -> Result<Arc<CompiledConfig>> {
             }
             // 只对有 options 的字段（single_select/toggle）验证选项存在性
             // slider 等连续型字段的值是字符串化的数字，不在 options 里
-            if let Some(opts) = field_options.get(field_id) {
-                if !opts.is_empty() && !opts.contains(opt_id) {
-                    return Err(Error::Config(format!(
-                        "preset '{}' references unknown option '{}' for field '{}'",
-                        preset.id, opt_id, field_id
-                    )));
-                }
+            if let Some(opts) = field_options.get(field_id)
+                && !opts.is_empty()
+                && !opts.contains(opt_id)
+            {
+                return Err(Error::Config(format!(
+                    "preset '{}' references unknown option '{}' for field '{}'",
+                    preset.id, opt_id, field_id
+                )));
             }
         }
     }
